@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word Adventure</title>
+    <meta
+      name="description"
+      content="Word Adventure is a colorful educational website for kids to learn figurative language, nouns, and fun English skills."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-glow glow-one"></div>
+    <div class="page-glow glow-two"></div>
+    <div class="floating-spark spark-1">✦</div>
+    <div class="floating-spark spark-2">✦</div>
+    <div class="floating-spark spark-3">✦</div>
+
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <button class="brand" type="button" data-page="home" aria-label="Go to home page">
+          <span class="brand-mark">WA</span>
+          <span class="brand-text">Word Adventure</span>
+        </button>
+
+        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="site-nav" aria-label="Main navigation">
+          <button class="nav-link active" type="button" data-page="home">
+            <span>🏠</span>Home
+          </button>
+          <button class="nav-link" type="button" data-page="lessons">
+            <span>📘</span>Lessons
+          </button>
+          <button class="nav-link" type="button" data-page="videos">
+            <span>🎬</span>Videos
+          </button>
+          <button class="nav-link" type="button" data-page="assessment">
+            <span>🧠</span>Assessment
+          </button>
+          <button class="nav-link" type="button" data-page="profile">
+            <span>👤</span>Teachers Profile
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="home" class="page active">
+        <div class="container hero-wrap">
+          <div class="hero-copy">
+            <p class="eyebrow">Adventure Learning</p>
+            <h1>WELCOME TO WORD ADVENTURE!</h1>
+            <h2>Learn English in a Fun and Exciting Way!</h2>
+            <p class="lead">
+              Explore figurative language, discover different types of nouns,
+              watch learning videos, and test what you know through fun
+              interactive activities.
+            </p>
+            <div class="hero-actions">
+              <button class="primary-btn" type="button" data-target="lessons">START LEARNING 🚀</button>
+              <button class="secondary-btn" type="button" data-target="assessment">TAKE THE QUIZ ⭐</button>
+            </div>
+            <div class="mini-badges">
+              <span>🌈 Figurative Language</span>
+              <span>📚 Nouns</span>
+              <span>🎉 Quizzes</span>
+            </div>
+          </div>
+
+          <div class="hero-illustration" aria-label="Cartoon student with book">
+            <div class="cloud cloud-one"></div>
+            <div class="cloud cloud-two"></div>
+            <div class="book-character">
+              <div class="character-head">
+                <span class="eye left"></span>
+                <span class="eye right"></span>
+                <span class="smile"></span>
+              </div>
+              <div class="character-body">
+                <span class="arm left"></span>
+                <span class="arm right"></span>
+              </div>
+              <div class="book">
+                <span class="book-spine"></span>
+              </div>
+            </div>
+            <div class="speech-bubble">"Ready to learn something awesome?"</div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Explore the journey</p>
+            <h3>WHAT WILL YOU LEARN?</h3>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card feature-card-purple">
+              <div class="feature-icon">📖</div>
+              <h4>FIGURATIVE LANGUAGE</h4>
+              <p>Learn how words can be used creatively.</p>
+              <button class="link-btn" type="button" data-target="lessons">EXPLORE LESSONS →</button>
+            </article>
+
+            <article class="feature-card feature-card-yellow">
+              <div class="feature-icon">📚</div>
+              <h4>TYPES OF NOUNS</h4>
+              <p>Discover different types of words that name people, places, things, animals, and ideas.</p>
+              <button class="link-btn" type="button" data-target="lessons">EXPLORE LESSONS →</button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="lessons" class="page">
+        <div class="container">
+          <div class="section-heading center">
+            <p class="eyebrow">Fun learning adventures</p>
+            <h3>LET'S LEARN!</h3>
+          </div>
+
+          <div class="lesson-grid">
+            <article
+              id="figurative-lesson"
+              class="lesson-card lesson-figurative"
+            >
+              <div class="lesson-header">
+                <span class="lesson-tag">Figurative Language</span>
+                <h4>🌈 Figurative Language Garden</h4>
+              </div>
+              <p>
+                Learn how writers use creative words and expressions to make
+                ideas more vivid, meaningful, and fun.
+              </p>
+
+              <div class="lesson-content">
+                <div class="concept-block">
+                  <h5>SIMILE</h5>
+                  <p>
+                    A simile compares two different things using <strong>"like"</strong> or <strong>"as."</strong>
+                  </p>
+                  <ul>
+                    <li>"He runs like a cheetah."</li>
+                    <li>"Her skin is as smooth as silk."</li>
+                    <li>"The stars shine like diamonds."</li>
+                  </ul>
+                </div>
+
+                <div class="concept-block">
+                  <h5>METAPHOR</h5>
+                  <p>
+                    A metaphor directly compares two different things by saying
+                    that one thing is another.
+                  </p>
+                  <ul>
+                    <li>"Her smile is sunshine."</li>
+                    <li>"Time is a thief."</li>
+                    <li>"The classroom was a zoo."</li>
+                  </ul>
+                </div>
+
+                <div class="concept-block">
+                  <h5>PERSONIFICATION</h5>
+                  <p>
+                    Personification gives human qualities, feelings, or actions to
+                    animals, objects, or things that are not human.
+                  </p>
+                  <ul>
+                    <li>"The sun smiled down on us."</li>
+                    <li>"The wind whispered through the trees."</li>
+                    <li>"The flowers danced in the breeze."</li>
+                  </ul>
+                </div>
+
+                <div class="concept-block">
+                  <h5>HYPERBOLE</h5>
+                  <p>
+                    Hyperbole is an exaggerated statement used to emphasize an idea or feeling. It is not meant to be taken literally.
+                  </p>
+                  <ul>
+                    <li>"I'm so hungry I could eat a horse."</li>
+                    <li>"I've told you a million times!"</li>
+                    <li>"My bag weighs a ton."</li>
+                  </ul>
+                </div>
+
+                <div class="concept-block">
+                  <h5>IDIOMS</h5>
+                  <p>
+                    An idiom is a word or phrase whose meaning cannot be understood simply by interpreting each word literally.
+                  </p>
+                  <ul>
+                    <li><strong>Break the ice</strong> — to make people feel more comfortable in a social situation.</li>
+                    <li><strong>Spill the beans</strong> — to reveal a secret.</li>
+                    <li><strong>Hit the books</strong> — to study seriously.</li>
+                  </ul>
+                </div>
+              </div>
+
+            </article>
+
+            <article
+              id="nouns-lesson"
+              class="lesson-card lesson-nouns"
+            >
+              <div class="lesson-header">
+                <span class="lesson-tag">Types of Nouns</span>
+                <h4>📚 Noun Neighborhood</h4>
+              </div>
+              <p>
+                Discover words that name people, places, things, animals, and ideas.
+              </p>
+
+              <div class="noun-intro">
+                <h5>A noun is a word that names a person, place, thing, animal, or idea.</h5>
+                <div class="noun-examples">
+                  <span>Person — teacher, student, mother</span>
+                  <span>Place — school, classroom, Philippines</span>
+                  <span>Thing — book, pencil, table</span>
+                  <span>Animal — dog, cat, bird</span>
+                  <span>Idea or feeling — love, happiness, freedom</span>
+                </div>
+              </div>
+
+              <div class="noun-grid">
+                <div class="noun-card">
+                  <h5>COMMON NOUN</h5>
+                  <p>Names a general person, place, animal, or thing.</p>
+                  <span>teacher, school, dog, book</span>
+                </div>
+                <div class="noun-card">
+                  <h5>PROPER NOUN</h5>
+                  <p>Names a specific person, place, organization, or thing.</p>
+                  <span>Maria, Cebu, Philippines, Monday</span>
+                </div>
+                <div class="noun-card">
+                  <h5>CONCRETE NOUN</h5>
+                  <p>Names something that can be experienced through the five senses.</p>
+                  <span>chair, apple, flower, music</span>
+                </div>
+                <div class="noun-card">
+                  <h5>ABSTRACT NOUN</h5>
+                  <p>Names an idea, feeling, quality, condition, or concept that cannot be physically touched.</p>
+                  <span>love, honesty, courage, happiness</span>
+                </div>
+                <div class="noun-card">
+                  <h5>COLLECTIVE NOUN</h5>
+                  <p>Names a group of people, animals, or things as one unit.</p>
+                  <span>team, family, flock, audience, class</span>
+                </div>
+                <div class="noun-card">
+                  <h5>COMPOUND NOUN</h5>
+                  <p>A noun formed from two or more words combined into one name.</p>
+                  <span>classroom, toothpaste, bus stop, mother-in-law</span>
+                </div>
+              </div>
+
+            </article>
+          </div>
+
+          <section class="practice-card" aria-labelledby="practice-title">
+            <p class="eyebrow">Practice what you learned</p>
+            <h4 id="practice-title">LESSON EXERCISE ✏️</h4>
+            <p class="practice-intro">Answer a few questions about nouns and parts of speech.</p>
+            <div id="practice-exercise" class="quiz-card" aria-live="polite"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="videos" class="page">
+        <div class="container">
+          <div class="section-heading center">
+            <p class="eyebrow">Learn by watching</p>
+            <h3>WATCH & LEARN 🎬</h3>
+          </div>
+
+          <div class="video-grid">
+            <article
+              class="video-card"
+              data-video="figurative-language"
+              data-video-src="videos/Paler-%20Multimedia.mp4"
+              role="button"
+              tabindex="0"
+              aria-label="Play Let's Learn Figurative Language"
+            >
+              <div class="video-thumbnail thumb-figurative">
+                <div class="play-badge">▶</div>
+              </div>
+              <div class="video-text">
+                <h4>"Let's Learn Figurative Language!"</h4>
+                <p>Explore similes, metaphors, personification, hyperbole, and idioms in a fun way.</p>
+                <div class="video-meta">
+                  <span>Video lesson</span>
+                  <span>Interactive Lesson</span>
+                </div>
+              </div>
+            </article>
+
+            <article
+              class="video-card"
+              data-video="types-of-nouns"
+              data-video-src="videos/Ramos-Multimedia.mov"
+              role="button"
+              tabindex="0"
+              aria-label="Play Let's Discover Nouns"
+            >
+              <div class="video-thumbnail thumb-nouns">
+                <div class="play-badge">▶</div>
+              </div>
+              <div class="video-text">
+                <h4>"Let's Discover Nouns!"</h4>
+                <p>Understand common, proper, collective, abstract, and compound nouns through examples.</p>
+                <div class="video-meta">
+                  <span>Video lesson</span>
+                  <span>Grammar Video</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="assessment" class="page">
+        <div id="assessment-picker" class="container assessment-picker">
+          <div class="quiz-header">
+            <p class="eyebrow">Check your progress</p>
+            <h3>YOUR ASSESSMENT JOURNEY 🧠</h3>
+            <p class="subtitle">Complete each assessment in order to unlock the next. Every assessment has its own score.</p>
+          </div>
+
+          <div class="assessment-options">
+            <article class="assessment-option">
+              <span class="lesson-tag">Assessment 1 · Start here</span>
+              <h4>Figurative Language</h4>
+              <p>Recognize similes, metaphors, personification, hyperbole, and idioms.</p>
+              <p id="figurative-assessment-score" class="assessment-score" aria-live="polite">Not taken yet</p>
+              <button class="primary-btn" type="button" data-start-assessment="0">START ASSESSMENT →</button>
+            </article>
+            <article class="assessment-option">
+              <span class="lesson-tag">Assessment 2 · Unlocks after Assessment 1</span>
+              <h4>Types of Nouns</h4>
+              <p>Identify common, proper, concrete, abstract, collective, and compound nouns.</p>
+              <p id="noun-assessment-score" class="assessment-score" aria-live="polite">Not taken yet</p>
+              <button class="primary-btn" type="button" data-start-assessment="1" disabled>LOCKED</button>
+            </article>
+            <article class="assessment-option">
+              <span class="lesson-tag">Assessment 3 · Unlocks after Assessment 2</span>
+              <h4>Parts of Speech</h4>
+              <p>Identify nouns, pronouns, verbs, adjectives, adverbs, prepositions, conjunctions, and interjections.</p>
+              <p id="speech-assessment-score" class="assessment-score" aria-live="polite">Not taken yet</p>
+              <button class="primary-btn" type="button" data-start-assessment="2" disabled>LOCKED</button>
+            </article>
+          </div>
+        </div>
+
+        <div id="assessment-quiz" class="container quiz-shell" hidden>
+          <p class="assessment-lock-notice" role="status">🔒 Site navigation is locked while you complete this assessment.</p>
+          <button id="back-to-assessments-btn" class="secondary-btn assessment-back" type="button">
+            ← BACK TO ASSESSMENTS
+          </button>
+          <div class="quiz-header">
+            <p class="eyebrow" id="assessment-part"></p>
+            <h3 id="assessment-title"></h3>
+            <p class="subtitle">Choose an answer. You can change it or revisit questions before submitting.</p>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-topline">
+              <span id="question-counter">Question 1 of 10</span>
+              <span id="answered-counter" class="answered-counter">0 of 10 answered</span>
+            </div>
+            <div class="progress-bar">
+              <span id="quiz-progress-bar"></span>
+            </div>
+          </div>
+          <div id="quiz-card" class="quiz-card" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <div
+        id="part-result-modal"
+        class="part-result-modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="part-result-title"
+        aria-describedby="part-result-message"
+        aria-hidden="true"
+      >
+        <div class="part-result-content">
+          <p class="eyebrow">Assessment complete</p>
+          <h3 id="part-result-title"></h3>
+          <p id="part-result-score" class="part-result-score"></p>
+          <p id="part-result-message" class="part-result-message"></p>
+          <div class="part-result-actions">
+            <button id="review-part-btn" class="secondary-btn" type="button">
+              REVIEW ANSWERS
+            </button>
+            <button id="continue-assessment-btn" class="primary-btn" type="button">
+              BACK TO ASSESSMENTS
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="part-confirm-modal"
+        class="part-result-modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="part-confirm-title"
+        aria-describedby="part-confirm-message"
+        aria-hidden="true"
+      >
+        <div class="part-result-content">
+          <p class="eyebrow">Before you submit</p>
+          <h3 id="part-confirm-title">Submit assessment?</h3>
+          <p id="part-confirm-message" class="part-result-message">
+            You can review your answers before submitting. Your score will appear after you confirm.
+          </p>
+          <div class="part-result-actions">
+            <button id="review-before-submit-btn" class="secondary-btn" type="button">
+              REVIEW MY ANSWERS
+            </button>
+            <button id="confirm-part-submit-btn" class="primary-btn" type="button">
+              YES, SUBMIT ASSESSMENT
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section id="profile" class="page">
+        <div class="container">
+          <div class="section-heading center">
+            <p class="eyebrow">Who made this?</p>
+            <h3>MEET YOUR TEACHERS 👋</h3>
+          </div>
+
+          <div class="profile-grid">
+            <article class="profile-card">
+              <img
+                class="profile-photo"
+                src="img/Ms.%20Cecile%20A.%20Ramos"
+                alt="Ms. Cecile A. Ramos"
+              />
+              <div class="profile-details">
+                <h4>Teacher Cecile</h4>
+                <p>
+                  She is a pre-service English teacher pursuing a Bachelor of
+                  Secondary Education major in English at Mandaue City College.
+                  She is passionate about creating engaging and meaningful
+                  learning experiences that inspire students to learn, grow, and
+                  communicate with confidence.
+                </p>
+              </div>
+            </article>
+            <article class="profile-card">
+              <img
+                class="profile-photo"
+                src="img/Juvert%20Paler.png"
+                alt="Teacher Juvert"
+              />
+              <div class="profile-details">
+                <h4>Teacher Juvert</h4>
+                <p>
+                  A third-year Bachelor of Secondary Education major in English
+                  student at Mandaue City College, this preservice English teacher
+                  is passionate about helping students develop language skills
+                  and express themselves creatively. This teacher believes that
+                  learning English should be engaging, meaningful, and enjoyable
+                  for every learner. Through interactive activities and creative
+                  teaching strategies, the goal is to create a positive learning
+                  environment that inspires students to learn and grow. Please
+                  address this teacher using the title and name above.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div
+      id="video-modal"
+      class="video-modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Video player"
+      aria-hidden="true"
+    >
+      <div class="video-modal-content">
+        <button class="modal-close" type="button" aria-label="Close video">✕</button>
+        <video id="lesson-video" controls playsinline preload="metadata">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
