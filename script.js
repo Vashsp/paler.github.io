@@ -412,13 +412,16 @@ function updateAssessmentScores() {
 
   submittedScores.forEach((score, index) => {
     const unlocked = index === 0 || Boolean(submittedScores[index - 1]);
+    const completed = Boolean(score);
     scoreElements[index].textContent = score
       ? `Last score: ${score.correct} / ${score.total} (${score.percentage}%)`
       : unlocked ? "Not taken yet" : `Complete Assessment ${index} to unlock`;
-    startButtons[index].disabled = !unlocked;
+    startButtons[index].disabled = !unlocked || completed;
     startButtons[index].textContent = !unlocked
       ? "LOCKED"
-      : score ? "RETAKE ASSESSMENT ↻" : "START ASSESSMENT →";
+      : completed
+        ? "COMPLETED ✓"
+        : "START ASSESSMENT →";
   });
 }
 
@@ -437,6 +440,7 @@ function showAssessmentPicker() {
 
 function startAssessment(partIndex) {
   if (!Number.isInteger(partIndex) || !assessmentParts[partIndex]) return;
+  if (submittedScores[partIndex]) return;
   if (partIndex > 0 && !submittedScores[partIndex - 1]) return;
 
   currentPart = partIndex;
