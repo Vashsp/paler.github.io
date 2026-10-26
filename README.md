@@ -13,7 +13,7 @@ This project is a static language-learning website with practice exercises and s
 
 - Assessments unlock in order.
 - Each assessment can be submitted only once.
-- Once an assessment is submitted, its score is saved and the assessment cannot be retaken.
+- Once an assessment is submitted, its score and answers are saved. You can review the questions, correct answers, and explanations later, but you cannot retake it.
 - To continue, complete the preceding assessment before the next one becomes available.
 
 ## Project files

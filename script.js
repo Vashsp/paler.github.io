@@ -296,6 +296,7 @@ const assessmentParts = [
 ];
 
 const assessmentStorageKey = "paler-assessment-scores";
+const assessmentReviewStorageKey = "paler-assessment-reviews";
 
 function shuffleQuestions(questions) {
   const shuffled = [...questions];
@@ -310,11 +311,16 @@ let currentPart = null;
 let currentQuestion = 0;
 const currentQuestions = assessmentParts.map(() => 0);
 let selectedAnswers = assessmentParts.map((part) => new Array(part.questions.length).fill(null));
+let assessmentQuestionOrders = assessmentParts.map((part) =>
+  part.questions.map((_, questionIndex) => questionIndex),
+);
+let savedAssessmentReviews = assessmentParts.map(() => null);
 let assessmentStarted = assessmentParts.map(() => false);
 let submittedScores = assessmentParts.map(() => null);
 let reviewingPart = false;
 let reviewQuestion = 0;
 let reviewingBeforeSubmit = false;
+let reviewingFromResult = false;
 
 function loadSavedAssessmentScores() {
   try {
@@ -342,7 +348,71 @@ function saveAssessmentScores() {
   }
 }
 
+function loadSavedAssessmentReviews() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(assessmentReviewStorageKey));
+    if (!Array.isArray(stored) || stored.length !== assessmentParts.length) return;
+
+    savedAssessmentReviews = stored.map((review, partIndex) => {
+      if (!review || typeof review !== "object") return null;
+
+      const questionCount = assessmentParts[partIndex].questions.length;
+      const { questionOrder, answers } = review;
+      if (
+        !Array.isArray(questionOrder) ||
+        questionOrder.length !== questionCount ||
+        questionOrder.some(
+          (questionIndex) =>
+            !Number.isInteger(questionIndex) ||
+            questionIndex < 0 ||
+            questionIndex >= questionCount,
+        ) ||
+        new Set(questionOrder).size !== questionCount ||
+        !Array.isArray(answers) ||
+        answers.length !== questionCount
+      ) {
+        return null;
+      }
+
+      const validAnswers = answers.every((answer, questionIndex) => {
+        if (answer === null) return true;
+        const question = assessmentParts[partIndex].questions[questionOrder[questionIndex]];
+        return Number.isInteger(answer) && answer >= 0 && answer < question.options.length;
+      });
+      if (!validAnswers) return null;
+
+      return {
+        questionOrder: [...questionOrder],
+        answers: [...answers],
+      };
+    });
+
+    savedAssessmentReviews.forEach((review, partIndex) => {
+      if (!review || !submittedScores[partIndex]) return;
+      assessmentQuestionOrders[partIndex] = review.questionOrder;
+      selectedAnswers[partIndex] = review.answers;
+    });
+  } catch (error) {
+    console.warn("Could not load saved assessment reviews:", error);
+  }
+}
+
+function saveAssessmentReviews() {
+  try {
+    localStorage.setItem(assessmentReviewStorageKey, JSON.stringify(savedAssessmentReviews));
+  } catch (error) {
+    console.warn("Could not save assessment reviews:", error);
+  }
+}
+
 loadSavedAssessmentScores();
+loadSavedAssessmentReviews();
+
+function getAssessmentQuestions(partIndex) {
+  return assessmentQuestionOrders[partIndex].map(
+    (questionIndex) => assessmentParts[partIndex].questions[questionIndex],
+  );
+}
 
 const practiceQuestions = [
   {
@@ -455,11 +525,11 @@ function updateAssessmentScores() {
     scoreElements[index].textContent = score
       ? `Last score: ${score.correct} / ${score.total} (${score.percentage}%)`
       : unlocked ? "Not taken yet" : `Complete Assessment ${index} to unlock`;
-    startButtons[index].disabled = !unlocked || completed;
+    startButtons[index].disabled = !unlocked;
     startButtons[index].textContent = !unlocked
       ? "LOCKED"
       : completed
-        ? "COMPLETED ✓"
+        ? "REVIEW ANSWERS →"
         : "START ASSESSMENT →";
   });
 }
@@ -473,28 +543,37 @@ function showAssessmentPicker() {
   partResultModal.setAttribute("aria-hidden", "true");
   reviewingPart = false;
   reviewingBeforeSubmit = false;
+  reviewingFromResult = false;
   updateAssessmentScores();
   updateNavigationLock();
 }
 
 function startAssessment(partIndex) {
   if (!Number.isInteger(partIndex) || !assessmentParts[partIndex]) return;
-  if (submittedScores[partIndex]) return;
   if (partIndex > 0 && !submittedScores[partIndex - 1]) return;
 
   currentPart = partIndex;
-  if (!assessmentStarted[partIndex] || submittedScores[partIndex]) {
-    assessmentParts[partIndex].questions = shuffleQuestions(assessmentParts[partIndex].questions);
+  const completed = Boolean(submittedScores[partIndex]);
+  if (completed) {
+    reviewingPart = true;
+    reviewingBeforeSubmit = false;
+    reviewingFromResult = false;
+    reviewQuestion = 0;
+  } else if (!assessmentStarted[partIndex]) {
+    assessmentQuestionOrders[partIndex] = shuffleQuestions(
+      assessmentQuestionOrders[partIndex],
+    );
     selectedAnswers[partIndex] = new Array(assessmentParts[partIndex].questions.length).fill(null);
     currentQuestions[partIndex] = 0;
     assessmentStarted[partIndex] = true;
+    reviewingPart = false;
+    reviewingBeforeSubmit = false;
+    reviewingFromResult = false;
   }
   currentQuestion = currentQuestions[partIndex];
 
   assessmentQuiz.hidden = false;
   assessmentPicker.hidden = true;
-  reviewingPart = false;
-  reviewingBeforeSubmit = false;
   updateNavigationLock();
   renderQuiz();
   showPage("assessment");
@@ -509,18 +588,23 @@ function renderQuiz() {
   if (currentPart === null) return;
 
   const part = assessmentParts[currentPart];
-  const question = part.questions[currentQuestion];
-  const progress = ((currentQuestion + 1) / part.questions.length) * 100;
+  const questions = getAssessmentQuestions(currentPart);
+  const question = questions[currentQuestion];
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   document.getElementById("assessment-part").textContent = `Assessment ${currentPart + 1}`;
   document.getElementById("assessment-title").textContent = part.title;
-  document.getElementById("question-counter").textContent = `Question ${currentQuestion + 1} of ${part.questions.length}`;
+  document.getElementById("question-counter").textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+  document.getElementById("assessment-instructions").textContent =
+    "Choose an answer. You can change it or revisit questions before submitting.";
+  document.querySelector(".assessment-lock-notice").textContent =
+    "🔒 Site navigation is locked while you complete this assessment.";
   const answeredCount = selectedAnswers[currentPart].filter((answer) => answer !== null).length;
   document.getElementById("answered-counter").textContent =
-    `${answeredCount} of ${part.questions.length} answered`;
+    `${answeredCount} of ${questions.length} answered`;
   document.getElementById("quiz-progress-bar").style.width = `${progress}%`;
 
-  const isLastQuestion = currentQuestion === part.questions.length - 1;
+  const isLastQuestion = currentQuestion === questions.length - 1;
   const selectedAnswer = selectedAnswers[currentPart][currentQuestion];
 
   const answersMarkup = question.options
@@ -541,7 +625,7 @@ function renderQuiz() {
 
   const quizCard = document.getElementById("quiz-card");
   quizCard.innerHTML = `
-    <p class="question-label">Question ${currentQuestion + 1} of ${part.questions.length}</p>
+    <p class="question-label">Question ${currentQuestion + 1} of ${questions.length}</p>
     <h4 class="quiz-question">${question.question}</h4>
     <p class="quiz-prompt">${question.prompt}</p>
     <div class="answer-list">${answersMarkup}</div>
@@ -577,7 +661,7 @@ function renderQuiz() {
   nextButton.addEventListener("click", () => {
     if (selectedAnswers[currentPart][currentQuestion] === null) return;
 
-    if (currentQuestion < part.questions.length - 1) {
+    if (currentQuestion < questions.length - 1) {
       currentQuestion += 1;
       currentQuestions[currentPart] = currentQuestion;
       renderQuiz();
@@ -590,7 +674,6 @@ function renderQuiz() {
 
 function getQuestionReviewExplanation(question, selectedAnswer) {
   const correctOption = question.options[question.answer];
-  const selectedOption = selectedAnswer !== null ? question.options[selectedAnswer] : "No answer selected";
   const promptText = question.prompt.toLowerCase();
 
   let concept = "the meaning and clue in the sentence";
@@ -606,24 +689,37 @@ function getQuestionReviewExplanation(question, selectedAnswer) {
     return `Correct! The key is to look for the clue in the sentence. This question is about ${concept}, and “${correctOption}” fits best because it matches the meaning, role, or style the sentence is showing. Good thinking—your answer follows the same clue the author gave you.`;
   }
 
+  if (selectedAnswer === null) {
+    return `The correct answer is “${correctOption}.” The clue in the sentence points to ${concept}, which is why “${correctOption}” is the best choice.`;
+  }
+
+  const selectedOption = question.options[selectedAnswer];
   return `The correct answer is “${correctOption}.” In this sentence, the clue points to ${concept}, and that clue matches “${correctOption}” more closely than “${selectedOption}.” You chose a reasonable option, but it does not match the wording or meaning as closely. When you see similar questions, look for the strongest clue in the sentence before choosing an answer.`;
 }
 
 function renderAssessmentReview() {
   const part = assessmentParts[currentPart];
-  const question = part.questions[reviewQuestion];
+  const questions = getAssessmentQuestions(currentPart);
+  const question = questions[reviewQuestion];
   const selectedAnswer = selectedAnswers[currentPart][reviewQuestion];
   const explanation = getQuestionReviewExplanation(question, selectedAnswer);
+  const completedReview = Boolean(submittedScores[currentPart]) && !reviewingBeforeSubmit;
 
   document.getElementById("assessment-part").textContent = `Review: Assessment ${currentPart + 1}`;
   document.getElementById("assessment-title").textContent = part.title;
+  document.getElementById("assessment-instructions").textContent = completedReview
+    ? "Review only: your submitted answers are locked and this assessment cannot be retaken."
+    : "Review your selected answers before submitting.";
+  document.querySelector(".assessment-lock-notice").textContent = completedReview
+    ? "🔎 Review mode: answers are read-only; you cannot retake this assessment."
+    : "🔒 Site navigation is locked while you complete this assessment.";
   document.getElementById("question-counter").textContent =
-    `Question ${reviewQuestion + 1} of ${part.questions.length}`;
+    `Question ${reviewQuestion + 1} of ${questions.length}`;
   document.getElementById("answered-counter").textContent = reviewingBeforeSubmit
     ? "Review your selected answer"
     : `${selectedAnswer === question.answer ? "Correct answer selected" : "Correct answer shown"}`;
   document.getElementById("quiz-progress-bar").style.width =
-    `${((reviewQuestion + 1) / part.questions.length) * 100}%`;
+    `${((reviewQuestion + 1) / questions.length) * 100}%`;
 
   const answerMarkup = question.options
     .map((option, index) => {
@@ -660,10 +756,14 @@ function renderAssessmentReview() {
         ← PREVIOUS
       </button>
       <button class="secondary-btn" type="button" id="return-to-score-btn">
-        ${reviewingBeforeSubmit ? "BACK TO SUBMIT" : "BACK TO SCORE"}
+        ${reviewingBeforeSubmit
+          ? "BACK TO SUBMIT"
+          : reviewingFromResult
+            ? "BACK TO SCORE"
+            : "BACK TO ASSESSMENTS"}
       </button>
       <button class="primary-btn" type="button" id="next-review-btn">
-        ${reviewQuestion === part.questions.length - 1 ? "FINISH REVIEW" : "NEXT →"}
+        ${reviewQuestion === questions.length - 1 ? "FINISH REVIEW" : "NEXT →"}
       </button>
     </div>
   `;
@@ -675,7 +775,7 @@ function renderAssessmentReview() {
     }
   });
   document.getElementById("next-review-btn").addEventListener("click", () => {
-    if (reviewQuestion < part.questions.length - 1) {
+    if (reviewQuestion < questions.length - 1) {
       reviewQuestion += 1;
       renderAssessmentReview();
     } else {
@@ -705,6 +805,10 @@ function returnToPartResult() {
     reviewBeforeSubmitButton.focus();
     return;
   }
+  if (!reviewingFromResult) {
+    showAssessmentPicker();
+    return;
+  }
   partResultModal.classList.remove("hidden");
   partResultModal.setAttribute("aria-hidden", "false");
   reviewPartButton.focus();
@@ -713,6 +817,7 @@ function returnToPartResult() {
 reviewPartButton.addEventListener("click", () => {
   reviewingPart = true;
   reviewingBeforeSubmit = false;
+  reviewingFromResult = true;
   reviewQuestion = 0;
   partResultModal.classList.add("hidden");
   partResultModal.setAttribute("aria-hidden", "true");
@@ -734,6 +839,7 @@ function showPartConfirmation() {
 reviewBeforeSubmitButton.addEventListener("click", () => {
   reviewingPart = true;
   reviewingBeforeSubmit = true;
+  reviewingFromResult = false;
   reviewQuestion = 0;
   partConfirmModal.classList.add("hidden");
   partConfirmModal.setAttribute("aria-hidden", "true");
@@ -750,24 +856,30 @@ confirmPartSubmitButton.addEventListener("click", () => {
 
 function showPartResult() {
   const part = assessmentParts[currentPart];
-  const correct = part.questions.reduce(
+  const questions = getAssessmentQuestions(currentPart);
+  const correct = questions.reduce(
     (total, question, questionIndex) =>
       total + Number(selectedAnswers[currentPart][questionIndex] === question.answer),
     0,
   );
-  const percentage = Math.round((correct / part.questions.length) * 100);
+  const percentage = Math.round((correct / questions.length) * 100);
 
   submittedScores[currentPart] = {
     correct,
-    total: part.questions.length,
+    total: questions.length,
     percentage,
   };
+  savedAssessmentReviews[currentPart] = {
+    questionOrder: [...assessmentQuestionOrders[currentPart]],
+    answers: [...selectedAnswers[currentPart]],
+  };
   saveAssessmentScores();
+  saveAssessmentReviews();
   updateAssessmentScores();
   updateNavigationLock();
   document.getElementById("part-result-title").textContent = part.title;
   document.getElementById("part-result-score").textContent =
-    `${correct} out of ${part.questions.length} correct (${percentage}%)`;
+    `${correct} out of ${questions.length} correct (${percentage}%)`;
   document.getElementById("part-result-message").textContent =
     percentage >= 80
       ? `Great work! Your Assessment ${currentPart + 1} score is saved separately.`
