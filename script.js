@@ -295,6 +295,8 @@ const assessmentParts = [
   },
 ];
 
+const assessmentStorageKey = "paler-assessment-scores";
+
 let currentPart = null;
 let currentQuestion = 0;
 const currentQuestions = assessmentParts.map(() => 0);
@@ -304,6 +306,34 @@ let submittedScores = assessmentParts.map(() => null);
 let reviewingPart = false;
 let reviewQuestion = 0;
 let reviewingBeforeSubmit = false;
+
+function loadSavedAssessmentScores() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(assessmentStorageKey));
+    if (!Array.isArray(stored) || stored.length !== submittedScores.length) return;
+
+    submittedScores = stored.map((score) => {
+      if (!score || typeof score !== "object") return null;
+      return {
+        correct: Number(score.correct) || 0,
+        total: Number(score.total) || 0,
+        percentage: Number(score.percentage) || 0,
+      };
+    });
+  } catch (error) {
+    console.warn("Could not load saved assessment scores:", error);
+  }
+}
+
+function saveAssessmentScores() {
+  try {
+    localStorage.setItem(assessmentStorageKey, JSON.stringify(submittedScores));
+  } catch (error) {
+    console.warn("Could not save assessment scores:", error);
+  }
+}
+
+loadSavedAssessmentScores();
 
 const practiceQuestions = [
   {
@@ -699,6 +729,7 @@ function showPartResult() {
     total: part.questions.length,
     percentage,
   };
+  saveAssessmentScores();
   updateAssessmentScores();
   updateNavigationLock();
   document.getElementById("part-result-title").textContent = part.title;
