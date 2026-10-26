@@ -588,10 +588,32 @@ function renderQuiz() {
   });
 }
 
+function getQuestionReviewExplanation(question, selectedAnswer) {
+  const correctOption = question.options[question.answer];
+  const selectedOption = selectedAnswer !== null ? question.options[selectedAnswer] : "No answer selected";
+  const promptText = question.prompt.toLowerCase();
+
+  let concept = "the meaning and clue in the sentence";
+  if (promptText.includes("part of speech")) {
+    concept = "the job the word plays in the sentence";
+  } else if (promptText.includes("type of noun")) {
+    concept = "the kind of noun the word is";
+  } else if (promptText.includes("figure of speech")) {
+    concept = "the figurative language device being used";
+  }
+
+  if (selectedAnswer === question.answer) {
+    return `Correct! The key is to look for the clue in the sentence. This question is about ${concept}, and “${correctOption}” fits best because it matches the meaning, role, or style the sentence is showing. Good thinking—your answer follows the same clue the author gave you.`;
+  }
+
+  return `The correct answer is “${correctOption}.” In this sentence, the clue points to ${concept}, and that clue matches “${correctOption}” more closely than “${selectedOption}.” You chose a reasonable option, but it does not match the wording or meaning as closely. When you see similar questions, look for the strongest clue in the sentence before choosing an answer.`;
+}
+
 function renderAssessmentReview() {
   const part = assessmentParts[currentPart];
   const question = part.questions[reviewQuestion];
   const selectedAnswer = selectedAnswers[currentPart][reviewQuestion];
+  const explanation = getQuestionReviewExplanation(question, selectedAnswer);
 
   document.getElementById("assessment-part").textContent = `Review: Assessment ${currentPart + 1}`;
   document.getElementById("assessment-title").textContent = part.title;
@@ -632,6 +654,7 @@ function renderAssessmentReview() {
     <h4 class="quiz-question">${question.question}</h4>
     <p class="quiz-prompt">${question.prompt}</p>
     <div class="answer-list">${answerMarkup}</div>
+    <p class="practice-feedback" aria-live="polite">${explanation}</p>
     <div class="quiz-actions review-actions">
       <button class="secondary-btn" type="button" id="previous-review-btn" ${reviewQuestion === 0 ? "disabled" : ""}>
         ← PREVIOUS
