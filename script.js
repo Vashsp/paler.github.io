@@ -297,6 +297,15 @@ const assessmentParts = [
 
 const assessmentStorageKey = "paler-assessment-scores";
 
+function shuffleQuestions(questions) {
+  const shuffled = [...questions];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
 let currentPart = null;
 let currentQuestion = 0;
 const currentQuestions = assessmentParts.map(() => 0);
@@ -475,6 +484,7 @@ function startAssessment(partIndex) {
 
   currentPart = partIndex;
   if (!assessmentStarted[partIndex] || submittedScores[partIndex]) {
+    assessmentParts[partIndex].questions = shuffleQuestions(assessmentParts[partIndex].questions);
     selectedAnswers[partIndex] = new Array(assessmentParts[partIndex].questions.length).fill(null);
     currentQuestions[partIndex] = 0;
     assessmentStarted[partIndex] = true;
