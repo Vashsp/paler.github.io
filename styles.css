@@ -693,6 +693,138 @@ video {
   font-weight: 800;
 }
 
+.feedback-shell {
+  max-width: 820px;
+}
+
+.feedback-form {
+  display: grid;
+  gap: 12px;
+  padding: 26px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(128, 152, 228, 0.18);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.feedback-form > label,
+.rating-fieldset legend {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.feedback-form input[type="text"],
+.feedback-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(92, 109, 143, 0.3);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.feedback-form textarea {
+  resize: vertical;
+}
+
+.rating-fieldset {
+  min-width: 0;
+  margin: 4px 0;
+  padding: 0;
+  border: 0;
+}
+
+.rating-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rating-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px;
+  border: 1px solid rgba(92, 109, 143, 0.22);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.rating-options input {
+  accent-color: #e6a900;
+}
+
+.rating-options label > span:first-of-type,
+.feedback-rating {
+  color: #b37a00;
+}
+
+.rating-name {
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.feedback-form .primary-btn {
+  justify-self: start;
+}
+
+.feedback-status,
+.feedback-note {
+  margin: 0;
+  color: var(--muted);
+}
+
+.feedback-status {
+  font-weight: 800;
+}
+
+.feedback-list-section {
+  margin-top: 36px;
+}
+
+.feedback-list-section > h4 {
+  margin: 0 0 16px;
+  font: 800 1.6rem/1.1 "Baloo 2", sans-serif;
+}
+
+.feedback-list {
+  display: grid;
+  gap: 12px;
+}
+
+.feedback-entry {
+  padding: 18px 20px;
+  border-left: 4px solid var(--green);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.feedback-entry-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.feedback-entry h5 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.feedback-entry p,
+.feedback-empty {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.feedback-rating {
+  flex: none;
+  letter-spacing: 0.08em;
+}
+
 .progress-caption {
   margin: 10px 0 0;
   color: var(--muted);

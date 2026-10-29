@@ -297,6 +297,7 @@ const assessmentParts = [
 
 const assessmentStorageKey = "paler-assessment-scores";
 const assessmentReviewStorageKey = "paler-assessment-reviews";
+const feedbackStorageKey = "paler-visitor-feedback";
 
 function shuffleQuestions(questions) {
   const shuffled = [...questions];
@@ -416,22 +417,71 @@ function getAssessmentQuestions(partIndex) {
 
 const practiceQuestions = [
   {
-    question: '"The class cheered for the team."',
-    prompt: 'What type of noun is "team"?',
-    options: ["Proper", "Collective", "Abstract"],
+    question: '“The stars danced playfully across the night sky.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Simile", "Metaphor", "Personification", "Hyperbole"],
+    answer: 2,
+  },
+  {
+    question: "Which sentence contains a simile?",
+    prompt: "Choose the best answer.",
+    options: [
+      "Her voice was music to my ears.",
+      "The baby slept like a peaceful angel.",
+      "The flowers nodded in the breeze.",
+      "I waited forever for the bus.",
+    ],
     answer: 1,
   },
   {
-    question: '"A playful puppy ran quickly."',
-    prompt: 'What part of speech is "playful"?',
-    options: ["Adjective", "Verb", "Noun"],
+    question: '“My brother is a walking encyclopedia.”',
+    prompt: "What does this metaphor suggest?",
+    options: [
+      "He carries books everywhere.",
+      "He knows a great deal of information.",
+      "He walks very slowly.",
+      "He enjoys visiting libraries.",
+    ],
+    answer: 1,
+  },
+  {
+    question: "Which sentence uses hyperbole?",
+    prompt: "Choose the exaggerated statement.",
+    options: [
+      "The leaves whispered in the wind.",
+      "Her eyes sparkled like diamonds.",
+      "I have told you a million times to clean your room.",
+      "The classroom was a beehive of activity.",
+    ],
+    answer: 2,
+  },
+  {
+    question: 'What does the idiom “break the ice” mean?',
+    prompt: "Choose the meaning of the idiom.",
+    options: [
+      "To crack a frozen object.",
+      "To begin a friendly conversation.",
+      "To end a friendship.",
+      "To make someone feel cold.",
+    ],
+    answer: 1,
+  },
+  {
+    question: '“The wind howled angrily throughout the night.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Personification", "Hyperbole", "Idiom", "Simile"],
     answer: 0,
   },
   {
-    question: '"The puppy ran quickly."',
-    prompt: 'What part of speech is "quickly"?',
-    options: ["Pronoun", "Adverb", "Preposition"],
-    answer: 1,
+    question: 'During a difficult examination, Ana says, “This test is a piece of cake!”',
+    prompt: "What does she mean?",
+    options: [
+      "The test contains questions about baking.",
+      "The test is made of food.",
+      "The test is very easy.",
+      "The test is impossible to finish.",
+    ],
+    answer: 2,
   },
 ];
 
@@ -931,7 +981,7 @@ function renderPracticeExercise() {
     : "";
 
   exercise.innerHTML = `
-    <p class="question-label">Practice ${practiceQuestion + 1} of ${practiceQuestions.length}</p>
+    <p class="question-label">Practice assessment</p>
     <h5 class="quiz-question">${question.question}</h5>
     <p class="quiz-prompt">${question.prompt}</p>
     <div class="answer-list">${answersMarkup}</div>
@@ -980,6 +1030,84 @@ function resetPracticeExercise() {
   practiceChecked = false;
   renderPracticeExercise();
 }
+
+function loadFeedbackEntries() {
+  try {
+    const entries = JSON.parse(localStorage.getItem(feedbackStorageKey));
+    return Array.isArray(entries) ? entries.filter((entry) =>
+      entry &&
+      typeof entry.name === "string" &&
+      typeof entry.comment === "string" &&
+      Number.isInteger(entry.rating) &&
+      entry.rating >= 1 &&
+      entry.rating <= 5,
+    ) : [];
+  } catch (error) {
+    console.warn("Could not load visitor feedback:", error);
+    return [];
+  }
+}
+
+function renderFeedbackEntries() {
+  const feedbackList = document.getElementById("feedback-list");
+  const entries = loadFeedbackEntries();
+  feedbackList.replaceChildren();
+
+  if (entries.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "feedback-empty";
+    emptyMessage.textContent = "No feedback yet. Be the first to share your experience.";
+    feedbackList.append(emptyMessage);
+    return;
+  }
+
+  entries.forEach((entry) => {
+    const article = document.createElement("article");
+    article.className = "feedback-entry";
+
+    const heading = document.createElement("div");
+    heading.className = "feedback-entry-heading";
+    const name = document.createElement("h5");
+    name.textContent = entry.name;
+    const rating = document.createElement("span");
+    rating.className = "feedback-rating";
+    rating.setAttribute("aria-label", `${entry.rating} out of 5 stars`);
+    rating.textContent = `${"★".repeat(entry.rating)}${"☆".repeat(5 - entry.rating)}`;
+    heading.append(name, rating);
+
+    const comment = document.createElement("p");
+    comment.textContent = entry.comment;
+    article.append(heading, comment);
+    feedbackList.append(article);
+  });
+}
+
+document.getElementById("feedback-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const formData = new FormData(form);
+  const entry = {
+    name: String(formData.get("name")).trim(),
+    rating: Number(formData.get("rating")),
+    comment: String(formData.get("comment")).trim(),
+  };
+
+  if (!entry.name || !entry.comment || entry.rating < 1 || entry.rating > 5) return;
+
+  const entries = [entry, ...loadFeedbackEntries()].slice(0, 50);
+  try {
+    localStorage.setItem(feedbackStorageKey, JSON.stringify(entries));
+  } catch (error) {
+    document.getElementById("feedback-status").textContent =
+      "Your feedback could not be saved on this device.";
+    console.warn("Could not save visitor feedback:", error);
+    return;
+  }
+
+  form.reset();
+  document.getElementById("feedback-status").textContent = "Thanks for sharing your feedback!";
+  renderFeedbackEntries();
+});
 
 let activeVideoCard = null;
 
@@ -1032,4 +1160,5 @@ videoModal.addEventListener("click", (event) => {
 setupNavigation();
 updateAssessmentScores();
 renderPracticeExercise();
+renderFeedbackEntries();
 showPage("home");

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Word Adventure</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta
       name="description"
       content="Word Adventure is a colorful educational website for kids to learn figurative language, nouns, and fun English skills."
@@ -48,6 +49,9 @@
           </button>
           <button class="nav-link" type="button" data-page="assessment">
             <span>🧠</span>Assessment
+          </button>
+          <button class="nav-link" type="button" data-page="feedback">
+            <span>💬</span>Feedback
           </button>
           <button class="nav-link" type="button" data-page="profile">
             <span>👤</span>Teachers Profile
@@ -217,7 +221,7 @@
             >
               <div class="lesson-header">
                 <span class="lesson-tag">Types of Nouns</span>
-                <h4>📚 Noun Neighborhood</h4>
+                <h4>📚 Type of Nouns</h4>
               </div>
               <p>
                 Discover words that name people, places, things, animals, and ideas.
@@ -273,7 +277,7 @@
           <section class="practice-card" aria-labelledby="practice-title">
             <p class="eyebrow">Practice what you learned</p>
             <h4 id="practice-title">LESSON EXERCISE ✏️</h4>
-            <p class="practice-intro">Answer a few questions about nouns and parts of speech.</p>
+            <p class="practice-intro">Choose the best answer for each question.</p>
             <div id="practice-exercise" class="quiz-card" aria-live="polite"></div>
           </section>
         </div>
@@ -320,7 +324,7 @@
                 <div class="play-badge">▶</div>
               </div>
               <div class="video-text">
-                <h4>"Let's Discover Nouns!"</h4>
+                <h4>"Let's Learn Part of Speech!"</h4>
                 <p>Understand common, proper, collective, abstract, and compound nouns through examples.</p>
                 <div class="video-meta">
                   <span>Video lesson</span>
@@ -486,6 +490,43 @@
               </div>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section id="feedback" class="page">
+        <div class="container feedback-shell">
+          <div class="section-heading center">
+            <p class="eyebrow">Your experience matters</p>
+            <h3>SHARE YOUR FEEDBACK 💬</h3>
+            <p class="subtitle">Leave a rating and tell us what you think about Word Adventure.</p>
+          </div>
+
+          <form id="feedback-form" class="feedback-form">
+            <label for="feedback-name">Your name</label>
+            <input id="feedback-name" name="name" type="text" maxlength="60" autocomplete="name" required />
+
+            <fieldset class="rating-fieldset">
+              <legend>Your rating</legend>
+              <div class="rating-options">
+                <label><input type="radio" name="rating" value="1" required /><span aria-hidden="true">★</span><span class="rating-name">1 star</span></label>
+                <label><input type="radio" name="rating" value="2" /><span aria-hidden="true">★</span><span class="rating-name">2 stars</span></label>
+                <label><input type="radio" name="rating" value="3" /><span aria-hidden="true">★</span><span class="rating-name">3 stars</span></label>
+                <label><input type="radio" name="rating" value="4" /><span aria-hidden="true">★</span><span class="rating-name">4 stars</span></label>
+                <label><input type="radio" name="rating" value="5" /><span aria-hidden="true">★</span><span class="rating-name">5 stars</span></label>
+              </div>
+            </fieldset>
+
+            <label for="feedback-comment">Your comment</label>
+            <textarea id="feedback-comment" name="comment" rows="5" maxlength="1000" required></textarea>
+            <button class="primary-btn" type="submit">POST FEEDBACK</button>
+            <p id="feedback-status" class="feedback-status" role="status" aria-live="polite"></p>
+            <p class="feedback-note">Your comments and ratings stay saved on this device when you close the website.</p>
+          </form>
+
+          <section class="feedback-list-section" aria-labelledby="feedback-list-title">
+            <h4 id="feedback-list-title">VISITOR FEEDBACK</h4>
+            <div id="feedback-list" class="feedback-list" aria-live="polite"></div>
+          </section>
         </div>
       </section>
     </main>
