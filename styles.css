@@ -736,34 +736,57 @@ video {
 
 .rating-options {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  width: max-content;
+  max-width: 100%;
+  gap: 2px;
   margin-top: 10px;
 }
 
 .rating-options label {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 10px;
-  border: 1px solid rgba(92, 109, 143, 0.22);
-  border-radius: 10px;
-  background: #fff;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 48px;
   cursor: pointer;
 }
 
 .rating-options input {
-  accent-color: #e6a900;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
-.rating-options label > span:first-of-type,
+.rating-options label > span {
+  color: #c6ccd5;
+  font-size: 2rem;
+  line-height: 1;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.rating-options label:hover > span,
+.rating-options label:hover ~ label > span,
+.rating-options label:has(input:checked) > span,
+.rating-options label:has(input:checked) ~ label > span {
+  color: #e6a900;
+}
+
+.rating-options label:hover > span {
+  transform: scale(1.12);
+}
+
+.rating-options input:focus-visible + span {
+  outline: 2px solid var(--sky-deep);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 .feedback-rating {
   color: #b37a00;
-}
-
-.rating-name {
-  color: var(--ink);
-  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .feedback-form .primary-btn {
@@ -784,9 +807,24 @@ video {
   margin-top: 36px;
 }
 
-.feedback-list-section > h4 {
-  margin: 0 0 16px;
+.feedback-list-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.feedback-list-heading h4 {
+  margin: 0;
   font: 800 1.6rem/1.1 "Baloo 2", sans-serif;
+}
+
+.feedback-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 800;
 }
 
 .feedback-list {
@@ -795,26 +833,58 @@ video {
 }
 
 .feedback-entry {
-  padding: 18px 20px;
-  border-left: 4px solid var(--green);
-  background: rgba(255, 255, 255, 0.75);
+  padding: 20px 22px;
+  border: 1px solid rgba(92, 109, 143, 0.15);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 5px 16px rgba(45, 74, 160, 0.07);
 }
 
 .feedback-entry-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+}
+
+.feedback-author {
+  display: flex;
+  align-items: center;
+  min-width: 0;
   gap: 12px;
+}
+
+.feedback-author-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e2f5ee;
+  color: #287451;
+  font-weight: 900;
+}
+
+.feedback-author-details {
+  min-width: 0;
 }
 
 .feedback-entry h5 {
   margin: 0;
   font-size: 1.1rem;
+  overflow-wrap: anywhere;
 }
 
-.feedback-entry p,
+.feedback-date {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.feedback-comment,
 .feedback-empty {
-  margin: 10px 0 0;
+  margin: 16px 0 0;
   color: var(--muted);
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -822,7 +892,8 @@ video {
 
 .feedback-rating {
   flex: none;
-  letter-spacing: 0.08em;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
 }
 
 .progress-caption {

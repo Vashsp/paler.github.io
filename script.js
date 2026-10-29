@@ -1050,10 +1050,12 @@ function loadFeedbackEntries() {
 
 function renderFeedbackEntries() {
   const feedbackList = document.getElementById("feedback-list");
+  const feedbackSummary = document.getElementById("feedback-summary");
   const entries = loadFeedbackEntries();
   feedbackList.replaceChildren();
 
   if (entries.length === 0) {
+    feedbackSummary.textContent = "";
     const emptyMessage = document.createElement("p");
     emptyMessage.className = "feedback-empty";
     emptyMessage.textContent = "No feedback yet. Be the first to share your experience.";
@@ -1061,21 +1063,42 @@ function renderFeedbackEntries() {
     return;
   }
 
+  const averageRating = entries.reduce((total, entry) => total + entry.rating, 0) / entries.length;
+  feedbackSummary.textContent = `${entries.length} ${entries.length === 1 ? "review" : "reviews"} · ${averageRating.toFixed(1)} average`;
+
   entries.forEach((entry) => {
     const article = document.createElement("article");
     article.className = "feedback-entry";
 
     const heading = document.createElement("div");
     heading.className = "feedback-entry-heading";
+    const author = document.createElement("div");
+    author.className = "feedback-author";
+    const authorMark = document.createElement("span");
+    authorMark.className = "feedback-author-mark";
+    authorMark.setAttribute("aria-hidden", "true");
+    authorMark.textContent = entry.name.trim().charAt(0).toUpperCase();
+    const authorDetails = document.createElement("div");
+    authorDetails.className = "feedback-author-details";
     const name = document.createElement("h5");
     name.textContent = entry.name;
+    const date = document.createElement("p");
+    date.className = "feedback-date";
+    const submittedDate = entry.submittedAt ? new Date(entry.submittedAt) : null;
+    date.textContent = submittedDate && !Number.isNaN(submittedDate.getTime())
+      ? submittedDate.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+      : "Website visitor";
+    authorDetails.append(name, date);
+    author.append(authorMark, authorDetails);
+
     const rating = document.createElement("span");
     rating.className = "feedback-rating";
     rating.setAttribute("aria-label", `${entry.rating} out of 5 stars`);
     rating.textContent = `${"★".repeat(entry.rating)}${"☆".repeat(5 - entry.rating)}`;
-    heading.append(name, rating);
+    heading.append(author, rating);
 
     const comment = document.createElement("p");
+    comment.className = "feedback-comment";
     comment.textContent = entry.comment;
     article.append(heading, comment);
     feedbackList.append(article);
@@ -1090,6 +1113,7 @@ document.getElementById("feedback-form").addEventListener("submit", (event) => {
     name: String(formData.get("name")).trim(),
     rating: Number(formData.get("rating")),
     comment: String(formData.get("comment")).trim(),
+    submittedAt: new Date().toISOString(),
   };
 
   if (!entry.name || !entry.comment || entry.rating < 1 || entry.rating > 5) return;
