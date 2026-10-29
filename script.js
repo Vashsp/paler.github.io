@@ -483,6 +483,29 @@ const practiceQuestions = [
     ],
     answer: 2,
   },
+  {
+    question: '“The classroom was a beehive of activity.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Simile", "Metaphor", "Personification", "Hyperbole"],
+    answer: 1,
+  },
+  {
+    question: 'Mia “hit the books” before her examination.',
+    prompt: "What does the idiom mean?",
+    options: [
+      "She dropped her books.",
+      "She studied hard.",
+      "She bought new books.",
+      "She finished her examination.",
+    ],
+    answer: 1,
+  },
+  {
+    question: '“My backpack weighs a ton.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Simile", "Idiom", "Hyperbole", "Personification"],
+    answer: 2,
+  },
 ];
 
 let practiceQuestion = 0;
