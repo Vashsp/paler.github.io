@@ -402,6 +402,18 @@ video {
 .arm.right {
   right: -25px;
   transform: rotate(-26deg);
+  transform-origin: 50% 12%;
+  animation: child-wave 3.6s ease-in-out infinite;
+}
+
+@keyframes child-wave {
+  0%, 58%, 100% { transform: rotate(-26deg); }
+  64% { transform: rotate(-118deg); }
+  70% { transform: rotate(-102deg); }
+  76% { transform: rotate(-122deg); }
+  82% { transform: rotate(-102deg); }
+  88% { transform: rotate(-122deg); }
+  94% { transform: rotate(-26deg); }
 }
 
 .book {
