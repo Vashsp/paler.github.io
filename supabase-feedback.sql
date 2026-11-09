@@ -6,6 +6,9 @@ create table public.visitor_feedback (
   submitted_at timestamptz not null default now()
 );
 
+create index visitor_feedback_submitted_at_idx
+  on public.visitor_feedback (submitted_at desc);
+
 alter table public.visitor_feedback enable row level security;
 
 grant select, insert on public.visitor_feedback to anon;

@@ -11,7 +11,7 @@ This project is a static language-learning website with practice exercises and s
 
 ## Shared visitor feedback
 
-Feedback is stored in Supabase so visitors can see the same reviews and average rating. The summary counts all reviews; the page lists the 50 newest.
+Feedback is stored in Supabase so visitors can see the same reviews and average rating. The summary counts all reviews; the page lists the 50 newest. The site only contacts Supabase when a visitor opens the Feedback page, reuses results for one minute, and times out slow requests instead of keeping the page waiting indefinitely.
 
 1. Create a Supabase project.
 2. In the Supabase SQL Editor, run `supabase-feedback.sql`.
@@ -19,6 +19,8 @@ Feedback is stored in Supabase so visitors can see the same reviews and average 
 4. Deploy the site and verify that the Feedback page can load and post a review.
 
 Visitor names, ratings, and comments are publicly readable. The table allows public reads and inserts only; visitors cannot edit or delete reviews through the site.
+
+GitHub Pages can serve static pages to many visitors, but it does not protect the Supabase API from traffic spikes or automated submissions. Check your Supabase project's quotas and usage. For a large public launch, add a server-side submission endpoint with rate limiting and bot protection before allowing anonymous inserts; client-side checks alone cannot stop abuse.
 
 ## Assessment rules
 

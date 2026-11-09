@@ -297,6 +297,10 @@ const assessmentParts = [
 
 const assessmentStorageKey = "paler-assessment-scores";
 const assessmentReviewStorageKey = "paler-assessment-reviews";
+const feedbackCacheDuration = 60_000;
+let feedbackCache = null;
+let feedbackLoadPromise = null;
+
 function shuffleQuestions(questions) {
   const shuffled = [...questions];
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -1090,7 +1094,7 @@ function normalizeFeedbackEntry(entry) {
   };
 }
 
-async function fetchFeedbackEntries() {
+async function fetchFeedbackEntries(signal) {
   const { baseUrl, anonKey } = getFeedbackApiConfig();
   const headers = {
     apikey: anonKey,
@@ -1099,11 +1103,11 @@ async function fetchFeedbackEntries() {
   const [entriesResponse, summaryResponse] = await Promise.all([
     fetch(
       `${baseUrl}/rest/v1/visitor_feedback?select=name,rating,comment,submitted_at&order=submitted_at.desc&limit=50`,
-      { headers },
+      { headers, signal },
     ),
     fetch(
       `${baseUrl}/rest/v1/visitor_feedback_summary?select=review_count,average_rating`,
-      { headers },
+      { headers, signal },
     ),
   ]);
   if (!entriesResponse.ok || !summaryResponse.ok) {
@@ -1186,24 +1190,51 @@ function renderFeedbackEntries({ entries, reviewCount, averageRating }) {
   });
 }
 
-async function refreshFeedbackEntries() {
+async function refreshFeedbackEntries(forceRefresh = false) {
   const feedbackSummary = document.getElementById("feedback-summary");
   const feedbackList = document.getElementById("feedback-list");
-  feedbackSummary.textContent = "Loading feedback...";
-  feedbackList.replaceChildren();
-
-  try {
-    renderFeedbackEntries(await fetchFeedbackEntries());
-  } catch (error) {
-    feedbackSummary.textContent = "Feedback is unavailable right now.";
-    const message = document.createElement("p");
-    message.className = "feedback-empty";
-    message.textContent = error.message === "Supabase feedback is not configured."
-      ? "Shared feedback is not set up yet."
-      : "Please try again later.";
-    feedbackList.append(message);
-    console.warn("Could not load visitor feedback:", error);
+  if (!forceRefresh && feedbackCache && Date.now() - feedbackCache.loadedAt < feedbackCacheDuration) {
+    renderFeedbackEntries(feedbackCache.data);
+    return;
   }
+  if (feedbackLoadPromise) return feedbackLoadPromise;
+
+  if (feedbackCache) {
+    renderFeedbackEntries(feedbackCache.data);
+  } else {
+    feedbackSummary.textContent = "Loading feedback...";
+    feedbackList.replaceChildren();
+  }
+
+  feedbackLoadPromise = (async () => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
+    try {
+      const data = await fetchFeedbackEntries(controller.signal);
+      feedbackCache = { data, loadedAt: Date.now() };
+      renderFeedbackEntries(data);
+    } catch (error) {
+      if (feedbackCache) {
+        renderFeedbackEntries(feedbackCache.data);
+        feedbackSummary.textContent += " · showing saved results";
+      } else {
+        feedbackSummary.textContent = "Feedback is unavailable right now.";
+        const message = document.createElement("p");
+        message.className = "feedback-empty";
+        message.textContent = error.message === "Supabase feedback is not configured."
+          ? "Shared feedback is not set up yet."
+          : error.name === "AbortError"
+            ? "The feedback service is taking too long. Please try again."
+            : "Please try again later.";
+        feedbackList.append(message);
+      }
+      console.warn("Could not load visitor feedback:", error);
+    } finally {
+      clearTimeout(timeout);
+      feedbackLoadPromise = null;
+    }
+  })();
+  return feedbackLoadPromise;
 }
 
 document.getElementById("feedback-form").addEventListener("submit", async (event) => {
@@ -1233,10 +1264,13 @@ document.getElementById("feedback-form").addEventListener("submit", async (event
 
   submitButton.disabled = true;
   feedbackStatus.textContent = "Posting your feedback...";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
   try {
     const { baseUrl, anonKey } = getFeedbackApiConfig();
     const response = await fetch(`${baseUrl}/rest/v1/visitor_feedback`, {
       method: "POST",
+      signal: controller.signal,
       headers: {
         apikey: anonKey,
         Authorization: `Bearer ${anonKey}`,
@@ -1249,16 +1283,21 @@ document.getElementById("feedback-form").addEventListener("submit", async (event
       throw new Error(`Supabase could not save feedback (${response.status}).`);
     }
   } catch (error) {
-    feedbackStatus.textContent = "Your feedback could not be posted. Please try again later.";
+    feedbackStatus.textContent = error.name === "AbortError"
+      ? "The feedback service is taking too long. Please try again."
+      : "Your feedback could not be posted. Please try again later.";
     console.warn("Could not save visitor feedback:", error);
-    submitButton.disabled = false;
     return;
+  } finally {
+    clearTimeout(timeout);
+    submitButton.disabled = false;
   }
 
   form.reset();
   feedbackStatus.textContent = "Thanks for sharing your feedback!";
-  submitButton.disabled = false;
-  await refreshFeedbackEntries();
+  feedbackCache = null;
+  if (feedbackLoadPromise) await feedbackLoadPromise;
+  await refreshFeedbackEntries(true);
 });
 
 let activeVideoCard = null;
@@ -1312,5 +1351,4 @@ videoModal.addEventListener("click", (event) => {
 setupNavigation();
 updateAssessmentScores();
 renderPracticeExercise();
-refreshFeedbackEntries();
 showPage("home");
