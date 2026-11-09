@@ -188,7 +188,7 @@ video {
 .page {
   display: none;
   padding: 52px 0 72px;
-  min-height: calc(100vh - 82px);
+  min-height: calc(100vh - 83px);
   animation: fadeUp 0.45s ease;
 }
 
@@ -563,18 +563,35 @@ video {
   font-size: 0.8rem;
 }
 
+#lessons {
+  padding: clamp(10px, 1.5vh, 20px) 0;
+}
+
+#lessons .section-heading {
+  margin-bottom: 12px;
+}
+
+#lessons .section-heading .eyebrow {
+  margin-bottom: 4px;
+}
+
+#lessons .section-heading h3 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+}
+
 .lesson-deck-picker {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin: 0 auto 24px;
+  gap: 10px;
+  margin: 0 auto 14px;
 }
 
 .lesson-deck-button {
   border: 1px solid rgba(128, 152, 228, 0.24);
   border-radius: 999px;
-  padding: 12px 20px;
+  padding: 9px 18px;
   background: rgba(255, 255, 255, 0.82);
   color: var(--ink);
   font-weight: 900;
@@ -589,9 +606,9 @@ video {
 }
 
 .lesson-slide-viewer {
-  max-width: 1040px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: clamp(16px, 3vw, 30px);
+  padding: clamp(12px, 2vw, 20px);
   background: rgba(255, 255, 255, 0.84);
   border: 1px solid rgba(128, 152, 228, 0.18);
   border-radius: 28px;
@@ -599,12 +616,14 @@ video {
 }
 
 .lesson-slide-viewer h4 {
-  margin: 0 0 18px;
-  font: 800 clamp(1.5rem, 3vw, 2.2rem)/1.1 "Baloo 2", sans-serif;
+  margin: 0 0 10px;
+  font: 800 clamp(1.2rem, 2vw, 1.6rem)/1.1 "Baloo 2", sans-serif;
   text-align: center;
 }
 
 .lesson-slide-frame {
+  display: flex;
+  justify-content: center;
   margin: 0;
   overflow: hidden;
   border: 1px solid rgba(92, 109, 143, 0.15);
@@ -615,9 +634,11 @@ video {
 
 #lesson-slide-image {
   display: block;
-  width: 100%;
+  width: auto;
   height: auto;
+  max-width: 100%;
   aspect-ratio: 16 / 9;
+  max-height: min(540px, calc(100svh - 422px));
   object-fit: contain;
   background: #fff;
 }
@@ -626,8 +647,8 @@ video {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 16px;
-  margin-top: 18px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .lesson-slide-controls p {
