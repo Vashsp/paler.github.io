@@ -520,6 +520,15 @@ video {
   justify-content: space-between;
 }
 
+.feature-card[data-target] {
+  cursor: pointer;
+}
+
+.feature-card[data-target]:focus-visible {
+  outline: 3px solid var(--sky-deep);
+  outline-offset: 4px;
+}
+
 .feature-card-purple {
   background: linear-gradient(180deg, rgba(145, 122, 255, 0.14), rgba(255, 255, 255, 0.86));
 }
@@ -638,7 +647,7 @@ video {
   height: auto;
   max-width: 100%;
   aspect-ratio: 16 / 9;
-  max-height: min(540px, calc(100svh - 422px));
+  max-height: min(540px, calc(100svh - 300px));
   object-fit: contain;
   background: #fff;
 }

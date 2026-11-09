@@ -428,6 +428,7 @@ function showPage(pageName) {
     const isActive = section.id === pageName;
     section.classList.toggle("active", isActive);
   });
+  window.scrollTo(0, 0);
 
   navButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.page === pageName);
@@ -454,13 +455,26 @@ function setupNavigation() {
   });
 
   actionButtons.forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      if (button.classList.contains("feature-card") && event.target.closest("button")) return;
       if (isAssessmentInProgress()) return;
       const target = button.dataset.target;
+      if (button.dataset.lessonDeck) {
+        selectLessonDeck(button.dataset.lessonDeck);
+      }
       if (target === "assessment") {
         showAssessmentPicker();
       }
       showPage(target);
+    });
+  });
+
+  document.querySelectorAll(".feature-card[data-target]").forEach((card) => {
+    card.addEventListener("keydown", (event) => {
+      if (event.target !== card) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      card.click();
     });
   });
 
@@ -893,6 +907,19 @@ const lessonDecks = {
 let currentLessonDeck = "figurative-language";
 let currentLessonSlide = 1;
 
+function selectLessonDeck(deckName) {
+  if (!lessonDecks[deckName]) return;
+
+  currentLessonDeck = deckName;
+  currentLessonSlide = 1;
+  document.querySelectorAll(".lesson-deck-button").forEach((button) => {
+    const selected = button.dataset.lessonDeck === deckName;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  renderLessonSlide();
+}
+
 function renderLessonSlide() {
   const deck = lessonDecks[currentLessonDeck];
   const slideImage = document.getElementById("lesson-slide-image");
@@ -915,20 +942,13 @@ function renderLessonSlide() {
 }
 
 function setupLessonViewer() {
-  const deckButtons = document.querySelectorAll("[data-lesson-deck]");
+  const deckButtons = document.querySelectorAll(".lesson-deck-button");
   const previousButton = document.getElementById("lesson-previous-slide");
   const nextButton = document.getElementById("lesson-next-slide");
 
   deckButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      currentLessonDeck = button.dataset.lessonDeck;
-      currentLessonSlide = 1;
-      deckButtons.forEach((deckButton) => {
-        const selected = deckButton === button;
-        deckButton.classList.toggle("active", selected);
-        deckButton.setAttribute("aria-pressed", String(selected));
-      });
-      renderLessonSlide();
+      selectLessonDeck(button.dataset.lessonDeck);
     });
   });
 
