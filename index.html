@@ -132,150 +132,44 @@
             <h3>LET'S LEARN!</h3>
           </div>
 
-          <div class="lesson-grid">
-            <article
-              id="figurative-lesson"
-              class="lesson-card lesson-figurative"
+          <div class="lesson-deck-picker" role="group" aria-label="Choose a lesson presentation">
+            <button
+              class="lesson-deck-button active"
+              type="button"
+              data-lesson-deck="figurative-language"
+              aria-pressed="true"
             >
-              <div class="lesson-header">
-                <span class="lesson-tag">Figurative Language</span>
-                <h4>🌈 Figurative Language Garden</h4>
-              </div>
-              <p>
-                Learn how writers use creative words and expressions to make
-                ideas more vivid, meaningful, and fun.
-              </p>
-
-              <div class="lesson-content">
-                <div class="concept-block">
-                  <h5>SIMILE</h5>
-                  <p>
-                    A simile compares two different things using <strong>"like"</strong> or <strong>"as."</strong>
-                  </p>
-                  <ul>
-                    <li>"He runs like a cheetah."</li>
-                    <li>"Her skin is as smooth as silk."</li>
-                    <li>"The stars shine like diamonds."</li>
-                  </ul>
-                </div>
-
-                <div class="concept-block">
-                  <h5>METAPHOR</h5>
-                  <p>
-                    A metaphor directly compares two different things by saying
-                    that one thing is another.
-                  </p>
-                  <ul>
-                    <li>"Her smile is sunshine."</li>
-                    <li>"Time is a thief."</li>
-                    <li>"The classroom was a zoo."</li>
-                  </ul>
-                </div>
-
-                <div class="concept-block">
-                  <h5>PERSONIFICATION</h5>
-                  <p>
-                    Personification gives human qualities, feelings, or actions to
-                    animals, objects, or things that are not human.
-                  </p>
-                  <ul>
-                    <li>"The sun smiled down on us."</li>
-                    <li>"The wind whispered through the trees."</li>
-                    <li>"The flowers danced in the breeze."</li>
-                  </ul>
-                </div>
-
-                <div class="concept-block">
-                  <h5>HYPERBOLE</h5>
-                  <p>
-                    Hyperbole is an exaggerated statement used to emphasize an idea or feeling. It is not meant to be taken literally.
-                  </p>
-                  <ul>
-                    <li>"I'm so hungry I could eat a horse."</li>
-                    <li>"I've told you a million times!"</li>
-                    <li>"My bag weighs a ton."</li>
-                  </ul>
-                </div>
-
-                <div class="concept-block">
-                  <h5>IDIOMS</h5>
-                  <p>
-                    An idiom is a word or phrase whose meaning cannot be understood simply by interpreting each word literally.
-                  </p>
-                  <ul>
-                    <li><strong>Break the ice</strong> — to make people feel more comfortable in a social situation.</li>
-                    <li><strong>Spill the beans</strong> — to reveal a secret.</li>
-                    <li><strong>Hit the books</strong> — to study seriously.</li>
-                  </ul>
-                </div>
-              </div>
-
-            </article>
-
-            <article
-              id="nouns-lesson"
-              class="lesson-card lesson-nouns"
+              🌈 FIGURATIVE LANGUAGE
+            </button>
+            <button
+              class="lesson-deck-button"
+              type="button"
+              data-lesson-deck="types-of-nouns"
+              aria-pressed="false"
             >
-              <div class="lesson-header">
-                <span class="lesson-tag">Types of Nouns</span>
-                <h4>📚 Type of Nouns</h4>
-              </div>
-              <p>
-                Discover words that name people, places, things, animals, and ideas.
-              </p>
-
-              <div class="noun-intro">
-                <h5>A noun is a word that names a person, place, thing, animal, or idea.</h5>
-                <div class="noun-examples">
-                  <span>Person — teacher, student, mother</span>
-                  <span>Place — school, classroom, Philippines</span>
-                  <span>Thing — book, pencil, table</span>
-                  <span>Animal — dog, cat, bird</span>
-                  <span>Idea or feeling — love, happiness, freedom</span>
-                </div>
-              </div>
-
-              <div class="noun-grid">
-                <div class="noun-card">
-                  <h5>COMMON NOUN</h5>
-                  <p>Names a general person, place, animal, or thing.</p>
-                  <span>teacher, school, dog, book</span>
-                </div>
-                <div class="noun-card">
-                  <h5>PROPER NOUN</h5>
-                  <p>Names a specific person, place, organization, or thing.</p>
-                  <span>Maria, Cebu, Philippines, Monday</span>
-                </div>
-                <div class="noun-card">
-                  <h5>CONCRETE NOUN</h5>
-                  <p>Names something that can be experienced through the five senses.</p>
-                  <span>chair, apple, flower, music</span>
-                </div>
-                <div class="noun-card">
-                  <h5>ABSTRACT NOUN</h5>
-                  <p>Names an idea, feeling, quality, condition, or concept that cannot be physically touched.</p>
-                  <span>love, honesty, courage, happiness</span>
-                </div>
-                <div class="noun-card">
-                  <h5>COLLECTIVE NOUN</h5>
-                  <p>Names a group of people, animals, or things as one unit.</p>
-                  <span>team, family, flock, audience, class</span>
-                </div>
-                <div class="noun-card">
-                  <h5>COMPOUND NOUN</h5>
-                  <p>A noun formed from two or more words combined into one name.</p>
-                  <span>classroom, toothpaste, bus stop, mother-in-law</span>
-                </div>
-              </div>
-
-            </article>
+              📚 TYPES OF NOUNS
+            </button>
           </div>
 
-          <section class="practice-card" aria-labelledby="practice-title">
-            <p class="eyebrow">Practice what you learned</p>
-            <h4 id="practice-title">LESSON EXERCISE ✏️</h4>
-            <p class="practice-intro">Choose the best answer for each question.</p>
-            <div id="practice-exercise" class="quiz-card" aria-live="polite"></div>
+          <section class="lesson-slide-viewer" aria-labelledby="lesson-deck-title">
+            <h4 id="lesson-deck-title">Figurative Language Garden</h4>
+            <figure class="lesson-slide-frame">
+              <img
+                id="lesson-slide-image"
+                src="slides/figurative-language/slide-01.webp"
+                alt="Figurative Language Garden presentation, slide 1 of 15"
+                decoding="async"
+              />
+            </figure>
+            <div class="lesson-slide-controls">
+              <button id="lesson-previous-slide" class="secondary-btn" type="button" disabled>
+                ← PREVIOUS
+              </button>
+              <p id="lesson-slide-counter" aria-live="polite">Slide 1 of 15</p>
+              <button id="lesson-next-slide" class="primary-btn" type="button">
+                NEXT →
+              </button>
+            </div>
           </section>
         </div>
       </section>

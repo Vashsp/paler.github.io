@@ -16,8 +16,13 @@ This project is a static language-learning website with practice exercises and s
 - Once an assessment is submitted, its score and answers are saved. You can review the questions, correct answers, and explanations later, but you cannot retake it.
 - To continue, complete the preceding assessment before the next one becomes available.
 
+## Lesson slides
+
+The Lessons page displays the figurative language and types of nouns presentations as slides. Choose a presentation and move through it with the Previous/Next buttons or the left/right arrow keys; PowerPoint is not required.
+
 ## Project files
 
 - index.html: page structure and content
 - styles.css: site styling
-- script.js: quiz logic, assessment flow, and interactive behavior
+- script.js: quiz logic, assessment flow, slide navigation, and interactive behavior
+- slides/: optimized slide images used by the lesson presentations

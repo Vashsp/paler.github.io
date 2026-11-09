@@ -420,104 +420,6 @@ function getAssessmentQuestions(partIndex) {
   );
 }
 
-const practiceQuestions = [
-  {
-    question: '“The stars danced playfully across the night sky.”',
-    prompt: "Which figure of speech is used?",
-    options: ["Simile", "Metaphor", "Personification", "Hyperbole"],
-    answer: 2,
-  },
-  {
-    question: "Which sentence contains a simile?",
-    prompt: "Choose the best answer.",
-    options: [
-      "Her voice was music to my ears.",
-      "The baby slept like a peaceful angel.",
-      "The flowers nodded in the breeze.",
-      "I waited forever for the bus.",
-    ],
-    answer: 1,
-  },
-  {
-    question: '“My brother is a walking encyclopedia.”',
-    prompt: "What does this metaphor suggest?",
-    options: [
-      "He carries books everywhere.",
-      "He knows a great deal of information.",
-      "He walks very slowly.",
-      "He enjoys visiting libraries.",
-    ],
-    answer: 1,
-  },
-  {
-    question: "Which sentence uses hyperbole?",
-    prompt: "Choose the exaggerated statement.",
-    options: [
-      "The leaves whispered in the wind.",
-      "Her eyes sparkled like diamonds.",
-      "I have told you a million times to clean your room.",
-      "The classroom was a beehive of activity.",
-    ],
-    answer: 2,
-  },
-  {
-    question: 'What does the idiom “break the ice” mean?',
-    prompt: "Choose the meaning of the idiom.",
-    options: [
-      "To crack a frozen object.",
-      "To begin a friendly conversation.",
-      "To end a friendship.",
-      "To make someone feel cold.",
-    ],
-    answer: 1,
-  },
-  {
-    question: '“The wind howled angrily throughout the night.”',
-    prompt: "Which figure of speech is used?",
-    options: ["Personification", "Hyperbole", "Idiom", "Simile"],
-    answer: 0,
-  },
-  {
-    question: 'During a difficult examination, Ana says, “This test is a piece of cake!”',
-    prompt: "What does she mean?",
-    options: [
-      "The test contains questions about baking.",
-      "The test is made of food.",
-      "The test is very easy.",
-      "The test is impossible to finish.",
-    ],
-    answer: 2,
-  },
-  {
-    question: '“The classroom was a beehive of activity.”',
-    prompt: "Which figure of speech is used?",
-    options: ["Simile", "Metaphor", "Personification", "Hyperbole"],
-    answer: 1,
-  },
-  {
-    question: 'Mia “hit the books” before her examination.',
-    prompt: "What does the idiom mean?",
-    options: [
-      "She dropped her books.",
-      "She studied hard.",
-      "She bought new books.",
-      "She finished her examination.",
-    ],
-    answer: 1,
-  },
-  {
-    question: '“My backpack weighs a ton.”',
-    prompt: "Which figure of speech is used?",
-    options: ["Simile", "Idiom", "Hyperbole", "Personification"],
-    answer: 2,
-  },
-];
-
-let practiceQuestion = 0;
-let practiceAnswer = null;
-let practiceCorrect = 0;
-let practiceChecked = false;
-
 function showPage(pageName) {
   if (![...pageSections].some((section) => section.id === pageName)) return;
   if (isAssessmentInProgress() && pageName !== "assessment") return;
@@ -975,88 +877,90 @@ continueAssessmentButton.addEventListener("click", () => {
   document.querySelector("[data-start-assessment]").focus();
 });
 
-function renderPracticeExercise() {
-  const exercise = document.getElementById("practice-exercise");
+const lessonDecks = {
+  "figurative-language": {
+    title: "Figurative Language Garden",
+    slideCount: 15,
+    imageDirectory: "slides/figurative-language",
+  },
+  "types-of-nouns": {
+    title: "Types of Nouns",
+    slideCount: 17,
+    imageDirectory: "slides/types-of-nouns",
+  },
+};
 
-  if (practiceQuestion === practiceQuestions.length) {
-    exercise.innerHTML = `
-      <p class="question-label">Exercise complete</p>
-      <h5 class="quiz-question">You got ${practiceCorrect} out of ${practiceQuestions.length} correct!</h5>
-      <div class="quiz-actions">
-        <button class="primary-btn" type="button" id="practice-retry-btn">TRY AGAIN 🔁</button>
-      </div>
-    `;
-    document.getElementById("practice-retry-btn").addEventListener("click", resetPracticeExercise);
-    return;
+let currentLessonDeck = "figurative-language";
+let currentLessonSlide = 1;
+
+function renderLessonSlide() {
+  const deck = lessonDecks[currentLessonDeck];
+  const slideImage = document.getElementById("lesson-slide-image");
+  const slideFilename = `slide-${String(currentLessonSlide).padStart(2, "0")}.webp`;
+
+  slideImage.src = `${deck.imageDirectory}/${slideFilename}`;
+  slideImage.alt = `${deck.title} presentation, slide ${currentLessonSlide} of ${deck.slideCount}`;
+  document.getElementById("lesson-deck-title").textContent = deck.title;
+  document.getElementById("lesson-slide-counter").textContent =
+    `Slide ${currentLessonSlide} of ${deck.slideCount}`;
+  document.getElementById("lesson-previous-slide").disabled = currentLessonSlide === 1;
+  document.getElementById("lesson-next-slide").disabled =
+    currentLessonSlide === deck.slideCount;
+
+  if (currentLessonSlide < deck.slideCount) {
+    const nextSlideImage = new Image();
+    nextSlideImage.src =
+      `${deck.imageDirectory}/slide-${String(currentLessonSlide + 1).padStart(2, "0")}.webp`;
   }
+}
 
-  const question = practiceQuestions[practiceQuestion];
-  const answersMarkup = question.options
-    .map((option, index) => {
-      const selected = practiceAnswer === index ? "selected" : "";
-      const disabled = practiceChecked ? "disabled" : "";
-      return `
-        <button class="answer-choice ${selected}" type="button" data-index="${index}" ${disabled}>
-          ${option}
-        </button>
-      `;
-    })
-    .join("");
-  const feedback = practiceChecked
-    ? practiceAnswer === question.answer
-      ? "That's right! Great work."
-      : `Not quite. The correct answer is ${question.options[question.answer]}.`
-    : "";
+function setupLessonViewer() {
+  const deckButtons = document.querySelectorAll("[data-lesson-deck]");
+  const previousButton = document.getElementById("lesson-previous-slide");
+  const nextButton = document.getElementById("lesson-next-slide");
 
-  exercise.innerHTML = `
-    <p class="question-label">Practice assessment</p>
-    <h5 class="quiz-question">${question.question}</h5>
-    <p class="quiz-prompt">${question.prompt}</p>
-    <div class="answer-list">${answersMarkup}</div>
-    <p class="practice-feedback" aria-live="polite">${feedback}</p>
-    <div class="quiz-actions">
-      <button
-        class="primary-btn"
-        type="button"
-        id="practice-action-btn"
-        ${practiceAnswer === null ? "disabled" : ""}
-      >
-        ${practiceChecked
-          ? practiceQuestion === practiceQuestions.length - 1
-            ? "SEE MY SCORE 🎉"
-            : "NEXT QUESTION →"
-          : "CHECK ANSWER"}
-      </button>
-    </div>
-  `;
-
-  exercise.querySelectorAll(".answer-choice").forEach((button) => {
+  deckButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      practiceAnswer = Number(button.dataset.index);
-      renderPracticeExercise();
+      currentLessonDeck = button.dataset.lessonDeck;
+      currentLessonSlide = 1;
+      deckButtons.forEach((deckButton) => {
+        const selected = deckButton === button;
+        deckButton.classList.toggle("active", selected);
+        deckButton.setAttribute("aria-pressed", String(selected));
+      });
+      renderLessonSlide();
     });
   });
 
-  document.getElementById("practice-action-btn").addEventListener("click", () => {
-    if (practiceAnswer === null) return;
-    if (!practiceChecked) {
-      if (practiceAnswer === question.answer) practiceCorrect += 1;
-      practiceChecked = true;
-    } else {
-      practiceQuestion += 1;
-      practiceAnswer = null;
-      practiceChecked = false;
+  previousButton.addEventListener("click", () => {
+    if (currentLessonSlide > 1) {
+      currentLessonSlide -= 1;
+      renderLessonSlide();
     }
-    renderPracticeExercise();
   });
-}
 
-function resetPracticeExercise() {
-  practiceQuestion = 0;
-  practiceAnswer = null;
-  practiceCorrect = 0;
-  practiceChecked = false;
-  renderPracticeExercise();
+  nextButton.addEventListener("click", () => {
+    if (currentLessonSlide < lessonDecks[currentLessonDeck].slideCount) {
+      currentLessonSlide += 1;
+      renderLessonSlide();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (!document.getElementById("lessons").classList.contains("active")) return;
+    if (event.key === "ArrowLeft" && currentLessonSlide > 1) {
+      currentLessonSlide -= 1;
+      renderLessonSlide();
+    } else if (
+      event.key === "ArrowRight" &&
+      currentLessonSlide < lessonDecks[currentLessonDeck].slideCount
+    ) {
+      currentLessonSlide += 1;
+      renderLessonSlide();
+    }
+  });
+
+  renderLessonSlide();
 }
 
 let activeVideoCard = null;
@@ -1108,6 +1012,6 @@ videoModal.addEventListener("click", (event) => {
 });
 
 setupNavigation();
+setupLessonViewer();
 updateAssessmentScores();
-renderPracticeExercise();
 showPage("home");
