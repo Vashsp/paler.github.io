@@ -906,9 +906,10 @@ const lessonDecks = {
 
 let currentLessonDeck = "figurative-language";
 let currentLessonSlide = 1;
+let isSlideAnimating = false;
 
 function selectLessonDeck(deckName) {
-  if (!lessonDecks[deckName]) return;
+  if (!lessonDecks[deckName] || isSlideAnimating) return;
 
   currentLessonDeck = deckName;
   currentLessonSlide = 1;
@@ -930,15 +931,73 @@ function renderLessonSlide() {
   document.getElementById("lesson-deck-title").textContent = deck.title;
   document.getElementById("lesson-slide-counter").textContent =
     `Slide ${currentLessonSlide} of ${deck.slideCount}`;
-  document.getElementById("lesson-previous-slide").disabled = currentLessonSlide === 1;
+  document.getElementById("lesson-previous-slide").disabled =
+    isSlideAnimating || currentLessonSlide === 1;
   document.getElementById("lesson-next-slide").disabled =
-    currentLessonSlide === deck.slideCount;
+    isSlideAnimating || currentLessonSlide === deck.slideCount;
+  document.querySelectorAll(".lesson-deck-button").forEach((button) => {
+    button.disabled = isSlideAnimating;
+  });
 
   if (currentLessonSlide < deck.slideCount) {
     const nextSlideImage = new Image();
     nextSlideImage.src =
       `${deck.imageDirectory}/slide-${String(currentLessonSlide + 1).padStart(2, "0")}.webp`;
   }
+}
+
+async function turnLessonSlide(direction) {
+  const nextSlide = currentLessonSlide + direction;
+  if (
+    isSlideAnimating ||
+    nextSlide < 1 ||
+    nextSlide > lessonDecks[currentLessonDeck].slideCount
+  ) {
+    return;
+  }
+
+  const slideImage = document.getElementById("lesson-slide-image");
+  const hinge = direction > 0 ? "left center" : "right center";
+  const angle = direction > 0 ? -85 : 85;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  isSlideAnimating = true;
+  renderLessonSlide();
+
+  if (slideImage.animate && !reducedMotion) {
+    const turnOut = slideImage.animate(
+      [
+        { transform: "rotateY(0deg)", opacity: 1, filter: "brightness(1)" },
+        { transform: `rotateY(${angle}deg)`, opacity: 0.35, filter: "brightness(0.82)" },
+      ],
+      { duration: 180, easing: "ease-in", fill: "forwards" },
+    );
+    await turnOut.finished;
+    turnOut.cancel();
+  }
+
+  currentLessonSlide = nextSlide;
+  renderLessonSlide();
+
+  if (slideImage.animate && !reducedMotion) {
+    const angle = direction > 0 ? 85 : -85;
+    slideImage.style.transformOrigin = hinge;
+    const turnIn = slideImage.animate(
+      [
+        { transform: `rotateY(${angle}deg)`, opacity: 0.35, filter: "brightness(0.82)" },
+        { transform: "rotateY(0deg)", opacity: 1, filter: "brightness(1)" },
+      ],
+      { duration: 240, easing: "ease-out", fill: "both" },
+    );
+    await turnIn.finished;
+    turnIn.cancel();
+    slideImage.style.transformOrigin = "";
+    slideImage.style.transform = "";
+    slideImage.style.opacity = "";
+    slideImage.style.filter = "";
+  }
+
+  isSlideAnimating = false;
+  renderLessonSlide();
 }
 
 function setupLessonViewer() {
@@ -953,30 +1012,25 @@ function setupLessonViewer() {
   });
 
   previousButton.addEventListener("click", () => {
-    if (currentLessonSlide > 1) {
-      currentLessonSlide -= 1;
-      renderLessonSlide();
-    }
+    turnLessonSlide(-1);
   });
 
   nextButton.addEventListener("click", () => {
-    if (currentLessonSlide < lessonDecks[currentLessonDeck].slideCount) {
-      currentLessonSlide += 1;
-      renderLessonSlide();
-    }
+    turnLessonSlide(1);
   });
 
   document.addEventListener("keydown", (event) => {
-    if (!document.getElementById("lessons").classList.contains("active")) return;
-    if (event.key === "ArrowLeft" && currentLessonSlide > 1) {
-      currentLessonSlide -= 1;
-      renderLessonSlide();
-    } else if (
-      event.key === "ArrowRight" &&
-      currentLessonSlide < lessonDecks[currentLessonDeck].slideCount
-    ) {
-      currentLessonSlide += 1;
-      renderLessonSlide();
+    if (
+      !document.getElementById("lessons").classList.contains("active") ||
+      isSlideAnimating
+    ) return;
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      turnLessonSlide(-1);
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      turnLessonSlide(1);
     }
   });
 
