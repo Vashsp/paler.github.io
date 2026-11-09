@@ -297,8 +297,6 @@ const assessmentParts = [
 
 const assessmentStorageKey = "paler-assessment-scores";
 const assessmentReviewStorageKey = "paler-assessment-reviews";
-const feedbackStorageKey = "paler-visitor-feedback";
-
 function shuffleQuestions(questions) {
   const shuffled = [...questions];
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -529,6 +527,7 @@ function showPage(pageName) {
   siteNav.classList.remove("open");
   menuToggle.setAttribute("aria-expanded", "false");
   menuToggle.setAttribute("aria-label", "Open menu");
+  if (pageName === "feedback") refreshFeedbackEntries();
 }
 
 function setupNavigation() {
@@ -1054,40 +1053,99 @@ function resetPracticeExercise() {
   renderPracticeExercise();
 }
 
-function loadFeedbackEntries() {
-  try {
-    const entries = JSON.parse(localStorage.getItem(feedbackStorageKey));
-    return Array.isArray(entries) ? entries.filter((entry) =>
-      entry &&
-      typeof entry.name === "string" &&
-      typeof entry.comment === "string" &&
-      Number.isInteger(entry.rating) &&
-      entry.rating >= 1 &&
-      entry.rating <= 5,
-    ) : [];
-  } catch (error) {
-    console.warn("Could not load visitor feedback:", error);
-    return [];
+function getFeedbackApiConfig() {
+  const config = window.feedbackSupabaseConfig;
+  if (!config?.url || !config.anonKey) {
+    throw new Error("Supabase feedback is not configured.");
   }
+
+  const url = new URL(config.url);
+  if (url.protocol !== "https:" && !["localhost", "127.0.0.1"].includes(url.hostname)) {
+    throw new Error("The Supabase URL must use HTTPS.");
+  }
+
+  return {
+    baseUrl: url.href.replace(/\/$/, ""),
+    anonKey: config.anonKey,
+  };
 }
 
-function renderFeedbackEntries() {
+function normalizeFeedbackEntry(entry) {
+  if (
+    !entry ||
+    typeof entry.name !== "string" ||
+    typeof entry.comment !== "string" ||
+    !Number.isInteger(Number(entry.rating)) ||
+    Number(entry.rating) < 1 ||
+    Number(entry.rating) > 5
+  ) {
+    return null;
+  }
+
+  return {
+    name: entry.name,
+    rating: Number(entry.rating),
+    comment: entry.comment,
+    submittedAt: entry.submitted_at,
+  };
+}
+
+async function fetchFeedbackEntries() {
+  const { baseUrl, anonKey } = getFeedbackApiConfig();
+  const headers = {
+    apikey: anonKey,
+    Authorization: `Bearer ${anonKey}`,
+  };
+  const [entriesResponse, summaryResponse] = await Promise.all([
+    fetch(
+      `${baseUrl}/rest/v1/visitor_feedback?select=name,rating,comment,submitted_at&order=submitted_at.desc&limit=50`,
+      { headers },
+    ),
+    fetch(
+      `${baseUrl}/rest/v1/visitor_feedback_summary?select=review_count,average_rating`,
+      { headers },
+    ),
+  ]);
+  if (!entriesResponse.ok || !summaryResponse.ok) {
+    throw new Error(
+      `Supabase could not load feedback (${entriesResponse.status}, ${summaryResponse.status}).`,
+    );
+  }
+
+  const [entries, summaries] = await Promise.all([
+    entriesResponse.json(),
+    summaryResponse.json(),
+  ]);
+  if (!Array.isArray(entries) || !Array.isArray(summaries) || !summaries[0]) {
+    throw new Error("Supabase returned an invalid feedback response.");
+  }
+  const summary = summaries[0];
+  const reviewCount = Number(summary.review_count);
+  const averageRating = Number(summary.average_rating);
+  if (!Number.isInteger(reviewCount) || reviewCount < 0 || !Number.isFinite(averageRating)) {
+    throw new Error("Supabase returned an invalid feedback summary.");
+  }
+  return {
+    entries: entries.map(normalizeFeedbackEntry).filter(Boolean),
+    reviewCount,
+    averageRating,
+  };
+}
+
+function renderFeedbackEntries({ entries, reviewCount, averageRating }) {
   const feedbackList = document.getElementById("feedback-list");
   const feedbackSummary = document.getElementById("feedback-summary");
-  const entries = loadFeedbackEntries();
   feedbackList.replaceChildren();
 
-  if (entries.length === 0) {
-    feedbackSummary.textContent = "";
+  feedbackSummary.textContent = `${reviewCount} ${reviewCount === 1 ? "review" : "reviews"} · ${averageRating.toFixed(1)} average`;
+  if (reviewCount === 0) {
+    feedbackSummary.textContent = "0 reviews · no ratings yet";
     const emptyMessage = document.createElement("p");
     emptyMessage.className = "feedback-empty";
     emptyMessage.textContent = "No feedback yet. Be the first to share your experience.";
     feedbackList.append(emptyMessage);
     return;
   }
-
-  const averageRating = entries.reduce((total, entry) => total + entry.rating, 0) / entries.length;
-  feedbackSummary.textContent = `${entries.length} ${entries.length === 1 ? "review" : "reviews"} · ${averageRating.toFixed(1)} average`;
 
   entries.forEach((entry) => {
     const article = document.createElement("article");
@@ -1128,32 +1186,79 @@ function renderFeedbackEntries() {
   });
 }
 
-document.getElementById("feedback-form").addEventListener("submit", (event) => {
+async function refreshFeedbackEntries() {
+  const feedbackSummary = document.getElementById("feedback-summary");
+  const feedbackList = document.getElementById("feedback-list");
+  feedbackSummary.textContent = "Loading feedback...";
+  feedbackList.replaceChildren();
+
+  try {
+    renderFeedbackEntries(await fetchFeedbackEntries());
+  } catch (error) {
+    feedbackSummary.textContent = "Feedback is unavailable right now.";
+    const message = document.createElement("p");
+    message.className = "feedback-empty";
+    message.textContent = error.message === "Supabase feedback is not configured."
+      ? "Shared feedback is not set up yet."
+      : "Please try again later.";
+    feedbackList.append(message);
+    console.warn("Could not load visitor feedback:", error);
+  }
+}
+
+document.getElementById("feedback-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
+  const submitButton = form.querySelector('button[type="submit"]');
+  const feedbackStatus = document.getElementById("feedback-status");
   const formData = new FormData(form);
   const entry = {
     name: String(formData.get("name")).trim(),
     rating: Number(formData.get("rating")),
     comment: String(formData.get("comment")).trim(),
-    submittedAt: new Date().toISOString(),
   };
 
-  if (!entry.name || !entry.comment || entry.rating < 1 || entry.rating > 5) return;
+  if (
+    !entry.name ||
+    entry.name.length > 60 ||
+    !entry.comment ||
+    entry.comment.length > 1000 ||
+    !Number.isInteger(entry.rating) ||
+    entry.rating < 1 ||
+    entry.rating > 5
+  ) {
+    feedbackStatus.textContent = "Please enter your name, choose a rating, and add a comment.";
+    return;
+  }
 
-  const entries = [entry, ...loadFeedbackEntries()].slice(0, 50);
+  submitButton.disabled = true;
+  feedbackStatus.textContent = "Posting your feedback...";
   try {
-    localStorage.setItem(feedbackStorageKey, JSON.stringify(entries));
+    const { baseUrl, anonKey } = getFeedbackApiConfig();
+    const response = await fetch(`${baseUrl}/rest/v1/visitor_feedback`, {
+      method: "POST",
+      headers: {
+        apikey: anonKey,
+        Authorization: `Bearer ${anonKey}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(entry),
+    });
+    if (!response.ok) {
+      throw new Error(`Supabase could not save feedback (${response.status}).`);
+    }
   } catch (error) {
-    document.getElementById("feedback-status").textContent =
-      "Your feedback could not be saved on this device.";
+    feedbackStatus.textContent = "Your feedback could not be posted. Please try again later.";
     console.warn("Could not save visitor feedback:", error);
+    submitButton.disabled = false;
     return;
   }
 
   form.reset();
-  document.getElementById("feedback-status").textContent = "Thanks for sharing your feedback!";
-  renderFeedbackEntries();
+  feedbackStatus.textContent = "Thanks for sharing your feedback!";
+  submitButton.disabled = false;
+  await refreshFeedbackEntries();
 });
 
 let activeVideoCard = null;
@@ -1207,5 +1312,5 @@ videoModal.addEventListener("click", (event) => {
 setupNavigation();
 updateAssessmentScores();
 renderPracticeExercise();
-renderFeedbackEntries();
+refreshFeedbackEntries();
 showPage("home");
