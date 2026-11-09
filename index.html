@@ -50,9 +50,6 @@
           <button class="nav-link" type="button" data-page="assessment">
             <span>🧠</span>Assessment
           </button>
-          <button class="nav-link" type="button" data-page="feedback">
-            <span>💬</span>Feedback
-          </button>
           <button class="nav-link" type="button" data-page="profile">
             <span>👤</span>Teachers Profile
           </button>
@@ -492,46 +489,6 @@
           </div>
         </div>
       </section>
-
-      <section id="feedback" class="page">
-        <div class="container feedback-shell">
-          <div class="section-heading center">
-            <p class="eyebrow">Your experience matters</p>
-            <h3>SHARE YOUR FEEDBACK 💬</h3>
-            <p class="subtitle">Leave a rating and tell us what you think about Word Adventure.</p>
-          </div>
-
-          <form id="feedback-form" class="feedback-form">
-            <label for="feedback-name">Your name</label>
-            <input id="feedback-name" name="name" type="text" maxlength="60" autocomplete="name" required />
-
-            <fieldset class="rating-fieldset">
-              <legend>Your rating</legend>
-              <div class="rating-options">
-                <label><input type="radio" name="rating" value="5" aria-label="5 stars" /><span aria-hidden="true">★</span></label>
-                <label><input type="radio" name="rating" value="4" aria-label="4 stars" /><span aria-hidden="true">★</span></label>
-                <label><input type="radio" name="rating" value="3" aria-label="3 stars" /><span aria-hidden="true">★</span></label>
-                <label><input type="radio" name="rating" value="2" aria-label="2 stars" /><span aria-hidden="true">★</span></label>
-                <label><input type="radio" name="rating" value="1" aria-label="1 star" required /><span aria-hidden="true">★</span></label>
-              </div>
-            </fieldset>
-
-            <label for="feedback-comment">Your comment</label>
-            <textarea id="feedback-comment" name="comment" rows="5" maxlength="1000" required></textarea>
-            <button class="primary-btn" type="submit">POST FEEDBACK</button>
-            <p id="feedback-status" class="feedback-status" role="status" aria-live="polite"></p>
-            <p class="feedback-note">Your name, rating, and comment will be shared publicly with other visitors.</p>
-          </form>
-
-          <section class="feedback-list-section" aria-labelledby="feedback-list-title">
-            <div class="feedback-list-heading">
-              <h4 id="feedback-list-title">VISITOR FEEDBACK</h4>
-              <p id="feedback-summary" class="feedback-summary" aria-live="polite"></p>
-            </div>
-            <div id="feedback-list" class="feedback-list" aria-live="polite"></div>
-          </section>
-        </div>
-      </section>
     </main>
 
     <div
@@ -550,7 +507,6 @@
       </div>
     </div>
 
-    <script src="supabase-config.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -1,4 +1,0 @@
-window.feedbackSupabaseConfig = {
-  url: "",
-  anonKey: "",
-};
