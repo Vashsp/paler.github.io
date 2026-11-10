@@ -912,9 +912,104 @@ let practiceAnswer = null;
 let practiceCorrect = 0;
 let practiceChecked = false;
 
+const figurativePracticeQuestions = [
+  {
+    question: '“The stars danced playfully across the night sky.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Simile", "Metaphor", "Personification", "Hyperbole"],
+    answer: 2,
+  },
+  {
+    question: "Which sentence contains a simile?",
+    prompt: "Choose the best answer.",
+    options: [
+      "Her voice was music to my ears.",
+      "The baby slept like a peaceful angel.",
+      "The flowers nodded in the breeze.",
+      "I waited forever for the bus.",
+    ],
+    answer: 1,
+  },
+  {
+    question: '“My brother is a walking encyclopedia.”',
+    prompt: "What does this metaphor suggest?",
+    options: [
+      "He carries books everywhere.",
+      "He knows a great deal of information.",
+      "He walks very slowly.",
+      "He enjoys visiting libraries.",
+    ],
+    answer: 1,
+  },
+  {
+    question: "Which sentence uses hyperbole?",
+    prompt: "Choose the exaggerated statement.",
+    options: [
+      "The leaves whispered in the wind.",
+      "Her eyes sparkled like diamonds.",
+      "I have told you a million times to clean your room.",
+      "The classroom was a beehive of activity.",
+    ],
+    answer: 2,
+  },
+  {
+    question: 'What does the idiom “break the ice” mean?',
+    prompt: "Choose the meaning of the idiom.",
+    options: [
+      "To crack a frozen object.",
+      "To begin a friendly conversation.",
+      "To end a friendship.",
+      "To make someone feel cold.",
+    ],
+    answer: 1,
+  },
+  {
+    question: '“The wind howled angrily throughout the night.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Personification", "Hyperbole", "Idiom", "Simile"],
+    answer: 0,
+  },
+  {
+    question: 'During a difficult examination, Ana says, “This test is a piece of cake!”',
+    prompt: "What does she mean?",
+    options: [
+      "The test contains questions about baking.",
+      "The test is made of food.",
+      "The test is very easy.",
+      "The test is impossible to finish.",
+    ],
+    answer: 2,
+  },
+  {
+    question: '“The classroom was a beehive of activity.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Simile", "Metaphor", "Personification", "Hyperbole"],
+    answer: 1,
+  },
+  {
+    question: 'Mia “hit the books” before her examination.',
+    prompt: "What does the idiom mean?",
+    options: [
+      "She dropped her books.",
+      "She studied hard.",
+      "She bought new books.",
+      "She finished her examination.",
+    ],
+    answer: 1,
+  },
+  {
+    question: '“My backpack weighs a ton.”',
+    prompt: "Which figure of speech is used?",
+    options: ["Simile", "Idiom", "Hyperbole", "Personification"],
+    answer: 2,
+  },
+];
+
 function getLessonPracticeQuestions() {
-  const partIndex = currentLessonDeck === "types-of-nouns" ? 1 : 0;
-  return assessmentParts[partIndex].questions;
+  if (currentLessonDeck === "types-of-nouns") {
+    return assessmentParts[1].questions.slice(0, 10);
+  }
+  return figurativePracticeQuestions;
 }
 
 function renderPracticeExercise() {
