@@ -907,6 +907,95 @@ const lessonDecks = {
 let currentLessonDeck = "figurative-language";
 let currentLessonSlide = 1;
 let isSlideAnimating = false;
+let practiceQuestion = 0;
+let practiceAnswer = null;
+let practiceCorrect = 0;
+let practiceChecked = false;
+
+function getLessonPracticeQuestions() {
+  const partIndex = currentLessonDeck === "types-of-nouns" ? 1 : 0;
+  return assessmentParts[partIndex].questions;
+}
+
+function renderPracticeExercise() {
+  const exercise = document.getElementById("practice-exercise");
+  const questions = getLessonPracticeQuestions();
+
+  if (practiceQuestion === questions.length) {
+    exercise.innerHTML = `
+      <p class="question-label">Exercise complete</p>
+      <h5 class="quiz-question">You got ${practiceCorrect} out of ${questions.length} correct!</h5>
+      <div class="quiz-actions">
+        <button class="primary-btn" type="button" id="practice-retry-btn">TRY AGAIN 🔁</button>
+      </div>
+    `;
+    document.getElementById("practice-retry-btn").addEventListener("click", resetPracticeExercise);
+    return;
+  }
+
+  const question = questions[practiceQuestion];
+  const answersMarkup = question.options
+    .map((option, index) => {
+      const selected = practiceAnswer === index ? "selected" : "";
+      const disabled = practiceChecked ? "disabled" : "";
+      return `
+        <button class="answer-choice ${selected}" type="button" data-index="${index}" aria-pressed="${practiceAnswer === index}" ${disabled}>
+          ${option}
+        </button>
+      `;
+    })
+    .join("");
+  const feedback = practiceChecked
+    ? practiceAnswer === question.answer
+      ? "That's right! Great work."
+      : `Not quite. The correct answer is ${question.options[question.answer]}.`
+    : "";
+
+  exercise.innerHTML = `
+    <p class="question-label">Practice assessment · Question ${practiceQuestion + 1} of ${questions.length}</p>
+    <h5 class="quiz-question">${question.question}</h5>
+    <p class="quiz-prompt">${question.prompt}</p>
+    <div class="answer-list">${answersMarkup}</div>
+    <p class="practice-feedback" aria-live="polite">${feedback}</p>
+    <div class="quiz-actions">
+      <button class="primary-btn" type="button" id="practice-action-btn" ${practiceAnswer === null ? "disabled" : ""}>
+        ${practiceChecked
+          ? practiceQuestion === questions.length - 1
+            ? "SEE MY SCORE 🎉"
+            : "NEXT QUESTION →"
+          : "CHECK ANSWER"}
+      </button>
+    </div>
+  `;
+
+  exercise.querySelectorAll(".answer-choice").forEach((button) => {
+    button.addEventListener("click", () => {
+      practiceAnswer = Number(button.dataset.index);
+      renderPracticeExercise();
+    });
+  });
+
+  document.getElementById("practice-action-btn").addEventListener("click", () => {
+    if (practiceAnswer === null) return;
+    if (!practiceChecked) {
+      if (practiceAnswer === question.answer) practiceCorrect += 1;
+      practiceChecked = true;
+    } else {
+      practiceQuestion += 1;
+      practiceAnswer = null;
+      practiceChecked = false;
+    }
+    renderPracticeExercise();
+  });
+}
+
+function resetPracticeExercise() {
+  practiceQuestion = 0;
+  practiceAnswer = null;
+  practiceCorrect = 0;
+  practiceChecked = false;
+  renderPracticeExercise();
+}
 
 function selectLessonDeck(deckName) {
   if (!lessonDecks[deckName] || isSlideAnimating) return;
@@ -919,6 +1008,7 @@ function selectLessonDeck(deckName) {
     button.setAttribute("aria-pressed", String(selected));
   });
   renderLessonSlide();
+  resetPracticeExercise();
 }
 
 function renderLessonSlide() {
@@ -1035,6 +1125,7 @@ function setupLessonViewer() {
   });
 
   renderLessonSlide();
+  renderPracticeExercise();
 }
 
 let activeVideoCard = null;

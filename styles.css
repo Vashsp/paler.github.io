@@ -732,6 +732,27 @@ video {
   justify-self: end;
 }
 
+.practice-card {
+  max-width: 820px;
+  margin: 24px auto 0;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(128, 152, 228, 0.18);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.practice-card > h4 {
+  margin: 0;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.8rem;
+}
+
+.practice-intro {
+  margin: 8px 0 18px;
+  color: var(--muted);
+}
+
 .practice-feedback {
   min-height: 1.5em;
   margin: 16px 0 0;
